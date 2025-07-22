@@ -1,0 +1,5 @@
+INVOICE_ITEM_LIST = "/invoice-items"
+INVOICE_ITEM_DETAILS = "/invoice-items/{item_id:uuid}"
+INVOICE_ITEM_CREATE = "/invoice-items"
+INVOICE_ITEM_UPDATE = "/invoice-items/{invoice_item_id:uuid}"
+INVOICE_ITEM_DELETE = "/invoice-items/{item_id:uuid}"
