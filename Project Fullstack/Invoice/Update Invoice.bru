@@ -1,0 +1,47 @@
+meta {
+  name: Update Invoice
+  type: http
+  seq: 8
+}
+
+patch {
+  url: http://localhost:8015/invoice/f69de157-725a-4e7c-aca9-6e7c3cbb18c1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "invoiceNumber": "INV-1001",
+    "customerName": "Mr Kaung",
+    "companyName": "Kaung Ltd",
+    "invoiceDate": "2025-07-24",
+    "credit": "30 days",
+    "dueDate": "2025-08-23",
+    "remark": "Thanks for your business",
+    "subtotal": 120.00,
+    "vat": 12.00,
+    "totalAmount": 132.00,
+    "items": [
+      {
+        "invoiceItemId": "ITEM-001",
+        "invoiceNumber": "INV-1001",
+        "name": "Monitor",
+        "description": "24-inch LED Monitor",
+        "quantity": 1,
+        "unitPrice": 100.00,
+        "amount": 100.00
+      },
+      {
+        "invoiceItemId": "ITEM-002",
+        "invoiceNumber": "INV-1001",
+        "name": "Wireless Mouse",
+        "description": "Ergonomic wireless mouse",
+        "quantity": 2,
+        "unitPrice": 10.00,
+        "amount": 20.00
+      }
+    ]
+  }
+  
+}

@@ -66,12 +66,12 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         from app.domain.accounts.controllers import AccessController, UserController, UserRoleController
         from app.domain.accounts.deps import provide_user
         from app.domain.accounts.guards import auth as jwt_auth
-        from app.domain.invoice_items.services import InvoiceItemService
+        from app.domain.invoice.services import InvoiceService
         from app.domain.accounts.services import RoleService, UserService
         from app.domain.system.controllers import SystemController
         from app.domain.tags.controllers import TagController
         from app.domain.teams import signals as team_signals
-        from app.domain.invoice_items.controllers import InvoiceItemController
+        from app.domain.invoice.controllers import InvoiceController
         from app.domain.teams.controllers import TeamController, TeamMemberController
         from app.domain.teams.services import TeamMemberService, TeamService
         from app.domain.web.controllers import WebController
@@ -121,7 +121,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                 TeamMemberController,
                 TagController,
                 WebController,
-                InvoiceItemController
+                InvoiceController
             ],
         )
         # signatures
@@ -138,7 +138,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                 "TeamService": TeamService,
                 "TeamMemberService": TeamMemberService,
                 "UserRoleService": UserRoleService,
-                "InvoiceItemService":InvoiceItemService
+                "InvoiceService":InvoiceService
             },
         )
         # exception handling

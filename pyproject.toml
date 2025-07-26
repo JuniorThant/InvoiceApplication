@@ -25,6 +25,7 @@ dependencies = [
   "litestar-granian",
   "aiosqlite",
   "httptools",
+  "weasyprint>=61",
   "httpx-oauth>=0.16.1",
 ]
 description = "Opinionated template for a Litestar application."

@@ -8,6 +8,8 @@ from .team_roles import TeamRoles
 from .team_tag import team_tag
 from .user import User
 from .user_role import UserRole
+from .invoice import Invoice
+from .invoice_item import InvoiceItem
 
 __all__ = (
     "Role",
@@ -20,4 +22,6 @@ __all__ = (
     "UserOauthAccount",
     "UserRole",
     "team_tag",
+    "Invoice",
+    "InvoiceItem"
 )

@@ -102,3 +102,5 @@ class TagController(Controller):
     ) -> None:
         """Delete a tag."""
         _ = await tags_service.delete(tag_id)
+
+

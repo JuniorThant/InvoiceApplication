@@ -23,6 +23,74 @@ export namespace API {
     }
   }
 
+  export namespace InvoiceList {
+    export namespace Http200 {
+      export type ResponseBody = {
+        items: InvoiceSummary[];
+        pageSize: number;
+        page: number;
+        totalItems: number;
+        totalPages: number;
+      };
+
+      export type InvoiceSummary = {
+        id: string;
+        invoiceNumber: string;
+        customerName: string;
+        companyName: string;
+        invoiceDate: string;
+        dueDate: string;
+        totalAmount: number;
+        createdAt?: string;
+        updatedAt?: string;
+      };
+    }
+  }
+
+  export namespace InvoiceCreate {
+    export namespace Http201 {
+      export type ResponseBody = {
+        id: string;
+        invoiceNumber: string;
+        customerName: string;
+        companyName: string;
+        invoiceDate: string;
+        credit: string;
+        dueDate: string;
+        remark: string;
+        subtotal: number;
+        vat: number;
+        totalAmount: number;
+        items: InvoiceItem[];
+        createdAt?: string;
+        updatedAt?: string;
+      };
+    }
+
+    export type RequestBody = {
+      invoiceNumber: string;
+      customerName: string;
+      companyName: string;
+      invoiceDate: string;
+      credit: string;
+      dueDate: string; 
+      remark: string;
+      subtotal: number;
+      vat: number;
+      totalAmount: number;
+      items: InvoiceItem[];
+    };
+
+    export type InvoiceItem = {
+      invoiceItemId?: string;
+      name: string;
+      description?: string;
+      quantity: number;
+      unitPrice: number;
+      amount: number;
+    };
+  }
+
   export namespace AccountProfile {
     export namespace Http200 {
       export type ResponseBody = {
