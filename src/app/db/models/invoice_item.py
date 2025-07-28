@@ -24,7 +24,7 @@ class InvoiceItem(UUIDAuditBase):
     description: Mapped[str | None] = mapped_column(String(500), default=None)
     quantity: Mapped[int] = mapped_column(nullable=False, default=1)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
 
     #use lazy load normally for one to many relationship
     invoice: Mapped[Invoice] = relationship(

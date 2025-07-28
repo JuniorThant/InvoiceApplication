@@ -37,6 +37,7 @@ export namespace API {
         id: string;
         invoiceNumber: string;
         customerName: string;
+        customerMail:string;
         companyName: string;
         invoiceDate: string;
         dueDate: string;
@@ -53,6 +54,7 @@ export namespace API {
         id: string;
         invoiceNumber: string;
         customerName: string;
+        customerMail:string;
         companyName: string;
         invoiceDate: string;
         credit: string;
@@ -71,6 +73,7 @@ export namespace API {
       invoiceNumber: string;
       customerName: string;
       companyName: string;
+      customerMail:string;
       invoiceDate: string;
       credit: string;
       dueDate: string; 

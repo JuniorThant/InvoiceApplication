@@ -27,6 +27,7 @@ dependencies = [
   "httptools",
   "weasyprint>=61",
   "httpx-oauth>=0.16.1",
+  "playwright"
 ]
 description = "Opinionated template for a Litestar application."
 keywords = ["litestar", "sqlalchemy", "alembic", "fullstack", "api", "asgi", "litestar", "vite", "spa"]

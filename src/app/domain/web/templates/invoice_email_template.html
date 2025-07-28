@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; color: #000; }
+    .email-wrapper { padding: 20px; }
+    .message { margin-bottom: 20px; }
+    .invoice-box { border: 1px solid #ccc; padding: 20px; }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <p class="message">Dear {{ invoice.customer_name }},</p>
+    <p class="message">Please find your invoice below.</p>
+    <div class="invoice-box">
+      {{ invoice_html | safe }}
+    </div>
+    <p>Best regards,<br>Neural Dev Co., LTD</p>
+  </div>
+</body>
+</html>

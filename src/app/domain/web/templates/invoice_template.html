@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Template - Neural Dev Co., LTD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #000;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        /* Header Section */
+        .header {
+            text-align: left;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e40af;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            margin-right: 20px;
+        }
+        
+        .company-info h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        
+        .company-info p {
+            margin: 5px 0 0 0;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .invoice-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-details td {
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 11px;
+        }
+        
+        .invoice-details .label {
+            background: #f8f9fa;
+            font-weight: normal;
+            width: 25%;
+        }
+        
+        .invoice-details .value {
+            width: 25%;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .items-table th,
+        .items-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        .items-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .items-table .desc-col {
+            text-align: left;
+            width: 40%;
+        }
+        
+        .items-table .no-col {
+            width: 8%;
+        }
+        
+        .items-table .price-col,
+        .items-table .qty-col,
+        .items-table .amount-col {
+            width: 15%;
+        }
+        
+        .items-table tbody tr {
+            height: 30px;
+        }
+        
+        .bottom-section {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .remark-section {
+            flex: 1;
+            margin-right: 20px;
+        }
+        
+        .remark-box {
+            border: 1px solid #000;
+            padding: 8px;
+            height: 80px;
+            font-size: 11px;
+        }
+        
+        .summary-section {
+            width: 300px;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 11px;
+        }
+        
+        .summary-table .label {
+            background: #f8f9fa;
+            width: 60%;
+        }
+        
+        .signature-section {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .signature-section td {
+            border: 1px solid #000;
+            padding: 3px;
+            vertical-align: top;
+            width: 33.33%;
+            font-size: 11px;
+            height: 20px;
+        }
+        
+        .signature-section .payment-method {
+            background: #f8f9fa;
+        }
+        
+        .signature-line {
+            margin-top: 40px;
+            border-bottom: 1px solid #000;
+            width: 150px;
+        }
+        
+        .date-line {
+            margin-top: 20px;
+            display: flex;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">N</div>
+            <div class="company-info">
+                <h1>NEURAL DEV CO.,LTD</h1>
+                <p>Address : 55/15 Moo5 Tambol Mueng<br>
+                Amphor Mueng Chonburi , Chonburi , 20130</p>
+            </div>
+        </div>
+        
+        <table class="invoice-details">
+            <tr>
+                <td class="label">NEURAL DEV CO.,LTD</td>
+                <td rowspan="3" class="label">Invoice Number : {{ invoice.invoice_number }} <br>
+                    Invoice Date : {{ invoice.invoice_date.strftime('%d/%m/%Y') }} <br>
+                    Credit : {{ invoice.credit }} <br>
+                    Due Date : {{ invoice.due_date.strftime('%d/%m/%Y') }}
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Customer / Buyer : {{ invoice.customer_name }}</td>
+            </tr>
+            <tr>
+                <td class="label">Name / Company : {{ invoice.company_name }}</td>
+            </tr>
+        </table>
+        
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th class="no-col">No</th>
+                    <th class="desc-col">Item / Description</th>
+                    <th class="price-col">Price / Unit</th>
+                    <th class="qty-col">Quantity</th>
+                    <th class="amount-col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice.items %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td class="desc-col">
+                        <strong>{{ item.name }}</strong><br>
+                        {{ item.description or '' }}
+                    </td>
+                    <td>{{ "%.2f"|format(item.unit_price) }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ "%.2f"|format(item.amount) }}</td>
+                </tr>
+                {% endfor %}
+                
+                {% for i in range(4 - invoice.items|length) %}
+                {% if i >= 0 %}
+                <tr><td></td><td></td><td></td><td></td><td></td></tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="bottom-section">
+            <div class="remark-section">
+                <div class="remark-box">
+                    <strong>Remark : {{ invoice.remark }}</strong><br>
+                </div>
+            </div>
+            <div class="summary-section">
+                <table class="summary-table">
+                    <tr>
+                        <td class="label">Sub Total :</td>
+                        <td>{{ "%.2f"|format(invoice.subtotal) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">VAT :</td>
+                        <td>{{ "%.2f"|format(invoice.vat) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Total Amount :</td>
+                        <td><strong>{{ "%.2f"|format(invoice.total_amount) }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <table class="signature-section">
+            <tr>
+                <td class="payment-method">
+                
+                </td>
+                <td>
+                    <strong>For Customer</strong><br><br><br><br>
+                    <div class="date-line">
+                        <p>___/___/___<br>
+                        Date</p>
+                        <p>              _______________________<br>
+                    Signature</p>
+              
+                    </div>
+                
+                </td>
+                <td>
+                    <strong>For Neural Dev Co.,LTD</strong><br><br><br><br><br>
+                    <div class="signature-line"></div>
+                    Authorized Signature
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
