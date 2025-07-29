@@ -18,15 +18,22 @@ export default function CreateInvoice() {
     dueDate: "",
     remark: "",
     items: [],
-    bankInfo:[]
+    bankInfo:{
+      invoiceNumber:"",
+      bankName:"",
+      swift:"",
+      accountNumber:""
+    }
   });
 
   const [bankData,setBankData]=useState<{
-    name:string;
+    invoiceNumber:string;
+    bankName:string;
     swift:string;
     accountNumber:string;
   }>({
-    name:"",
+    invoiceNumber:"",
+    bankName:"",
     swift:"",
     accountNumber:""
   })
@@ -65,6 +72,10 @@ export default function CreateInvoice() {
       ...prev,
       [name]: value,
     }));
+    setBankData((prev)=>({
+      ...prev,
+      invoiceNumber:formData.invoiceNumber
+    }))
   };
 
   const handleBankChange=(
@@ -133,7 +144,7 @@ export default function CreateInvoice() {
     try {
       const finalFormData = {
         ...formData,
-        ...bankData,
+        bankInfo:bankData,
         items: itemsCount,
       };
 
@@ -248,14 +259,22 @@ export default function CreateInvoice() {
             <label className="block mb-1 font-medium">Bank Name</label>
             <input
               name="bankName"
-              value={bankData.name}
+              value={bankData.bankName}
               onChange={handleBankChange}
               className="w-full p-2 border rounded"
               type="text"
             />
           </div>
 
-          <div>
+              <div>
+            <label className="block mb-1 font-medium">Swift Number</label>
+            <input
+              name="swift"
+              value={bankData.swift}
+              onChange={handleBankChange}
+              className="w-full p-2 border rounded"
+              type="text"
+            />
           </div>
 
           <div>

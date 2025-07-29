@@ -1,9 +1,9 @@
 # type: ignore
-"""add invoice, invoice item, and bank info
+"""add invoice,invoice items, and bank info
 
-Revision ID: 041172a49dbe
+Revision ID: 1316a61d86e9
 Revises: 
-Create Date: 2025-07-29 08:29:48.504825+00:00
+Create Date: 2025-07-29 09:56:27.878887+00:00
 
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ sa.EncryptedString = EncryptedString
 sa.EncryptedText = EncryptedText
 
 # revision identifiers, used by Alembic.
-revision = '041172a49dbe'
+revision = '1316a61d86e9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -140,7 +140,7 @@ def schema_upgrades() -> None:
     op.create_table('bank_info',
     sa.Column('id', sa.GUID(length=16), nullable=False),
     sa.Column('invoice_number', sa.String(), nullable=False),
-    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('bank_name', sa.String(length=100), nullable=False),
     sa.Column('swift', sa.String(length=50), nullable=False),
     sa.Column('account_number', sa.String(length=50), nullable=False),
     sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),

@@ -17,7 +17,7 @@ class BankInfo(UUIDAuditBase):
         ForeignKey("invoice.invoice_number", ondelete="CASCADE"),
         nullable=False
     ) #Foreign key to the parent table
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    bank_name: Mapped[str] = mapped_column(String(100), nullable=False)
     swift: Mapped[str] = mapped_column(String(50), nullable=False)
     account_number: Mapped[str] = mapped_column(String(50), nullable=False)
 

@@ -159,7 +159,7 @@
         
         .signature-section td {
             border: 1px solid #000;
-            padding: 3px;
+            padding: 5px;
             vertical-align: top;
             width: 33.33%;
             font-size: 11px;
@@ -169,6 +169,10 @@
         .signature-section .payment-method {
             background: #f8f9fa;
         }
+
+        .signature-section table, .signature-section tr, .signature-section td{
+            height: 40px;
+        }
         
         .signature-line {
             margin-top: 40px;
@@ -177,8 +181,9 @@
         }
         
         .date-line {
-            margin-top: 20px;
             display: flex;
+            margin:10px;
+            justify-content: space-between;
         }
         
         @media print {
@@ -276,7 +281,12 @@
         <table class="signature-section">
             <tr>
                 <td class="payment-method">
-                
+                    <div>
+                        <strong>Payment Method:</strong>
+                        <p>Bank Name: {{invoice.bank_info.bank_name}}</p>
+                        <p>Swift Number: {{invoice.bank_info.swift}}</p>
+                        <p>Account Number: {{invoice.bank_info.account_number}}</p>
+                    </div>
                 </td>
                 <td>
                     <strong>For Customer</strong><br><br><br><br>

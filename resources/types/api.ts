@@ -61,7 +61,7 @@ export namespace API {
         dueDate: string;
         remark: string;
         items: InvoiceItem[];
-        bankInfo:BankInfo[];
+        bankInfo:BankInfo;
         createdAt?: string;
         updatedAt?: string;
       };
@@ -77,7 +77,7 @@ export namespace API {
       dueDate: string; 
       remark: string;
       items: InvoiceItem[];
-      bankInfo:BankInfo[];
+      bankInfo:BankInfo;
     };
 
     export type InvoiceItem = {
@@ -88,7 +88,8 @@ export namespace API {
       unitPrice: number;
     };
     export type BankInfo={
-      name:string;
+      invoiceNumber:string;
+      bankName:string;
       swift:string;
       accountNumber:string;
     }
