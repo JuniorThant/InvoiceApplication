@@ -1,9 +1,9 @@
 # type: ignore
-"""add invoice and invoice item
+"""add invoice, invoice item, and bank info
 
-Revision ID: f398c648034c
+Revision ID: 041172a49dbe
 Revises: 
-Create Date: 2025-07-24 11:51:53.841488+00:00
+Create Date: 2025-07-29 08:29:48.504825+00:00
 
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ sa.EncryptedString = EncryptedString
 sa.EncryptedText = EncryptedText
 
 # revision identifiers, used by Alembic.
-revision = 'f398c648034c'
+revision = '041172a49dbe'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -55,14 +55,15 @@ def schema_upgrades() -> None:
     sa.Column('id', sa.GUID(length=16), nullable=False),
     sa.Column('invoice_number', sa.String(), nullable=False),
     sa.Column('customer_name', sa.String(length=200), nullable=False),
+    sa.Column('customer_mail', sa.String(length=100), nullable=False),
     sa.Column('company_name', sa.String(length=200), nullable=False),
     sa.Column('invoice_date', sa.Date(), nullable=False),
     sa.Column('credit', sa.String(), nullable=False),
     sa.Column('due_date', sa.Date(), nullable=False),
     sa.Column('remark', sa.String(length=100), nullable=False),
-    sa.Column('subtotal', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('vat', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('subtotal', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('vat', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTimeUTC(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTimeUTC(timezone=True), nullable=False),
@@ -136,6 +137,18 @@ def schema_upgrades() -> None:
     with op.batch_alter_table('user_account', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_user_account_email'), ['email'], unique=True)
 
+    op.create_table('bank_info',
+    sa.Column('id', sa.GUID(length=16), nullable=False),
+    sa.Column('invoice_number', sa.String(), nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('swift', sa.String(length=50), nullable=False),
+    sa.Column('account_number', sa.String(length=50), nullable=False),
+    sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTimeUTC(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTimeUTC(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['invoice_number'], ['invoice.invoice_number'], name=op.f('fk_bank_info_invoice_number_invoice'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_bank_info'))
+    )
     op.create_table('invoice_item',
     sa.Column('id', sa.GUID(length=16), nullable=False),
     sa.Column('invoice_number', sa.String(), nullable=False),
@@ -144,7 +157,7 @@ def schema_upgrades() -> None:
     sa.Column('description', sa.String(length=500), nullable=True),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('unit_price', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTimeUTC(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTimeUTC(timezone=True), nullable=False),
@@ -245,6 +258,7 @@ def schema_downgrades() -> None:
 
     op.drop_table('team_invitation')
     op.drop_table('invoice_item')
+    op.drop_table('bank_info')
     with op.batch_alter_table('user_account', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_user_account_email'))
 

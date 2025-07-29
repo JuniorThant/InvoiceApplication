@@ -60,10 +60,8 @@ export namespace API {
         credit: string;
         dueDate: string;
         remark: string;
-        subtotal: number;
-        vat: number;
-        totalAmount: number;
         items: InvoiceItem[];
+        bankInfo:BankInfo[];
         createdAt?: string;
         updatedAt?: string;
       };
@@ -78,10 +76,8 @@ export namespace API {
       credit: string;
       dueDate: string; 
       remark: string;
-      subtotal: number;
-      vat: number;
-      totalAmount: number;
       items: InvoiceItem[];
+      bankInfo:BankInfo[];
     };
 
     export type InvoiceItem = {
@@ -90,8 +86,12 @@ export namespace API {
       description?: string;
       quantity: number;
       unitPrice: number;
-      amount: number;
     };
+    export type BankInfo={
+      name:string;
+      swift:string;
+      accountNumber:string;
+    }
   }
 
   export namespace AccountProfile {

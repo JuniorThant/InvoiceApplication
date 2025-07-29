@@ -4,12 +4,13 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Date, Numeric
+from sqlalchemy import String, Date, Numeric, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from advanced_alchemy.base import UUIDAuditBase
 
 if TYPE_CHECKING:
     from .invoice_item import InvoiceItem
+    from .bank_info import BankInfo
 
 
 class Invoice(UUIDAuditBase):
@@ -33,4 +34,9 @@ class Invoice(UUIDAuditBase):
         back_populates="invoice",
         cascade="all, delete-orphan",
         lazy="selectin"  
+    )
+
+    bank_info: Mapped[BankInfo] = relationship(
+        back_populates="invoice",
+        lazy="selectin"
     )

@@ -3,11 +3,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from app.config._utils import get_env
 
-SMTP_SERVER = get_env("SMTP_SERVER", default="")()
-SMTP_PORT = int(get_env("SMTP_PORT", default="587")())
-MAILTRAP_USER = get_env("MAILTRAP_USER", default="")()
-MAILTRAP_PASS = get_env("MAILTRAP_PASS", default="")()
-SENDER = get_env("SENDER", default="")()
+SMTP_SERVER = "sandbox.smtp.mailtrap.io"
+SMTP_PORT = 587
+MAILTRAP_USER = "254e5790826d47"
+MAILTRAP_PASS = "f74b2140e411aa"
+SENDER = "neuraldev@example.com"  
 
 
 """Send invoice email function"""

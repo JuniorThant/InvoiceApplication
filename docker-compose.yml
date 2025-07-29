@@ -64,6 +64,21 @@ services:
       SAQ_USE_SERVER_LIFESPAN: "false"
     env_file:
       - .env.docker.example
+  
+  tests:
+    build:
+      context: .
+      dockerfile: deploy/docker/run/Dockerfile
+    command: pytest --maxfail=1 --disable-warnings -q
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    env_file:
+      - .env.testing
+    restart: "no"
+
   worker:
     build:
       context: .

@@ -12,6 +12,7 @@ const Home: React.FC = () => {
   const [invoices, setInvoices] = useState<API.InvoiceList.Http200.InvoiceSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [modal,setModal]=useState(false)
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -43,7 +44,7 @@ const Home: React.FC = () => {
     try {
       setLoading(true);
       await sendInvoiceEmailService(invoiceId, auth.token);
-      alert("Invoice email sent successfully!");
+      setModal(true)
     } catch (e: any) {
       console.error(e);
       alert(`Failed to send invoice email: ${e.message}`);
@@ -64,6 +65,8 @@ const Home: React.FC = () => {
       description="Litestar Application - Home"
       keywords="home"
     >
+
+
       <div className="p-4 m-5">
         <button
           onClick={() => navigate("/create/invoice")}
@@ -71,7 +74,15 @@ const Home: React.FC = () => {
         >
           Create New Invoice
         </button>
-
+        {modal && (
+          <div className="border border-black rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-lg">
+            <p>Email sent successfully!</p>
+            <div className="flex justify-end">
+              <button className="button text-white bg-blue-600 rounded-md p-2" onClick={()=>setModal(false)}>Okay</button>
+            </div>
+        </div>
+        )
+        }
         {loading && <p>Loading invoices...</p>}
         {error && <p className="text-red-600">{error}</p>}
         {!loading && !error && (
@@ -131,6 +142,7 @@ const Home: React.FC = () => {
           </div>
         )}
       </div>
+
     </MainLayout>
   );
 };

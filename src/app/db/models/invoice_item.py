@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 
 from decimal import Decimal
 from sqlalchemy import String, Numeric, ForeignKey
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 class InvoiceItem(UUIDAuditBase):
     __tablename__ = "invoice_item"
     __table_args__ = {"comment": "Line items belonging to an invoice"}
-
+  
     invoice_number: Mapped[str] = mapped_column(
         ForeignKey("invoice.invoice_number", ondelete="CASCADE"),
         nullable=False

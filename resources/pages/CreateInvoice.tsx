@@ -1,237 +1,365 @@
-// import React, { useState } from "react";
-// import { createInvoiceService } from "@/services/invoice";
-// import { useNavigate } from "react-router-dom";
-// import { useAuth } from "@/contexts/AuthProvider";
-// import { API } from "@/types/api";
+import React, { useState } from "react";
+import { createInvoiceService } from "@/services/invoice";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthProvider";
+import { API } from "@/types/api";
 
-// export default function CreateInvoice() {
-//   const { auth } = useAuth();
-//   const navigate = useNavigate();
+export default function CreateInvoice() {
+  const { auth } = useAuth();
+  const navigate = useNavigate();
 
-//   const [formData, setFormData] = useState<API.InvoiceCreate.RequestBody>({
-//     invoiceNumber: "",
-//     customerName: "",
-//     customerMail:"",
-//     companyName: "",
-//     invoiceDate: "",
-//     credit: "",
-//     dueDate: "",
-//     remark: "",
-//     subtotal: 0,
-//     vat: 0,
-//     totalAmount: 0,
-//     items: [],
-//   });
+  const [formData, setFormData] = useState<API.InvoiceCreate.RequestBody>({
+    invoiceNumber: "",
+    customerName: "",
+    customerMail: "",
+    companyName: "",
+    invoiceDate: "",
+    credit: "",
+    dueDate: "",
+    remark: "",
+    items: [],
+    bankInfo:[]
+  });
 
-//   const [message, setMessage] = useState("");
-//   const [itemsCount,setItemsCount]=useState([]);
+  const [bankData,setBankData]=useState<{
+    name:string;
+    swift:string;
+    accountNumber:string;
+  }>({
+    name:"",
+    swift:"",
+    accountNumber:""
+  })
 
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-//     const { name, value } = e.target;
-//     const formItems=itemsCount
-//     setFormData((prev) => ({
-//       ...prev,
-//       formItems,
-//       [name]: ["subtotal", "vat", "totalAmount"].includes(name) ? parseFloat(value) : value,
-//     }));
-//   };
+  const [item, setItem] = useState<{
+    invoiceNumber:string;
+    name: string;
+    description: string;
+    quantity: string | number;
+    unitPrice: string | number;
+  }>({
+    invoiceNumber:"",
+    name: "",
+    description: "",
+    quantity: "",
+    unitPrice: "",
+  });
 
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
+  const [itemsCount, setItemsCount] = useState<
+    {
+      invoiceNumber:string;
+      name: string;
+      description: string;
+      quantity: number;
+      unitPrice: number;
+    }[]
+  >([]);
 
-//     if (!auth?.token) {
-//       setMessage("Unauthorized.");
-//       return;
-//     }
+  const [message, setMessage] = useState("");
 
-//     try {
-//       await createInvoiceService(formData, auth.token);
-//       setMessage("Invoice created successfully!");
-//       setTimeout(() => navigate("/"), 1000);
-//     } catch (error: any) {
-//       setMessage(`Error creating invoice: ${error.message}`);
-//     }
-//   };
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-//   return (
-//     <div className="p-6">
-//       <h2 className="text-2xl font-bold mb-4 text-center">Create Invoice</h2>
-//       <form onSubmit={handleSubmit} className="space-y-4 flex w-[100%]">
-//         <div className="w-[40%]">
-//         <div>
-//           <label className="block mb-1 font-medium">Invoice Number</label>
-//           <input
-//             name="invoiceNumber"
-//             value={formData.invoiceNumber}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+  const handleBankChange=(
+    e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  )=>{
+    const {name,value}=e.target;
+    setBankData((prev)=>({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
-//         <div>
-//           <label className="block mb-1 font-medium">Customer Name</label>
-//           <input
-//             name="customerName"
-//             value={formData.customerName}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+  const handleItemChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setItem((prev) => ({
+      ...prev,
+      [name]: ["quantity", "unitPrice"].includes(name)
+        ? value === "" ? "" : parseFloat(value)
+        : value,
+    }));
+  };
 
-//         <div>
-//           <label className="block mb-1 font-medium">Customer Email</label>
-//           <input
-//             name="customerMail"
-//             value={formData.customerMail}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+  const handleAddItem = () => {
+    if (
+      !item.name ||
+      item.quantity === "" ||
+      item.unitPrice === "" ||
+      isNaN(Number(item.quantity)) ||
+      isNaN(Number(item.unitPrice))
+    ) {
+      setMessage("Please fill all item fields before adding.");
+      return;
+    }
 
-//         <div>
-//           <label className="block mb-1 font-medium">Company Name</label>
-//           <input
-//             name="companyName"
-//             value={formData.companyName}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+    setItemsCount((prev) => [
+      ...prev,
+      {
+        invoiceNumber:formData.invoiceNumber,
+        name: item.name,
+        description: item.description,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+      },
+    ]);
 
-//         <div>
-//           <label className="block mb-1 font-medium">Invoice Date</label>
-//           <input
-//             type="date"
-//             name="invoiceDate"
-//             value={formData.invoiceDate}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+    setItem({
+      invoiceNumber:"",
+      name: "",
+      description: "",
+      quantity: "",
+      unitPrice: "",
+    });
+    setMessage("");
+  };
 
-//         <div>
-//           <label className="block mb-1 font-medium">Credit Terms</label>
-//           <input
-//             name="credit"
-//             value={formData.credit}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-//         <div>
-//           <label className="block mb-1 font-medium">Due Date</label>
-//           <input
-//             type="date"
-//             name="dueDate"
-//             value={formData.dueDate}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+    if (!auth?.token) {
+      setMessage("Unauthorized.");
+      return;
+    }
 
-//         <div>
-//           <label className="block mb-1 font-medium">Remark</label>
-//           <textarea
-//             name="remark"
-//             value={formData.remark}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//           />
-//         </div>
+    try {
+      const finalFormData = {
+        ...formData,
+        ...bankData,
+        items: itemsCount,
+      };
 
-//         <div>
-//           <label className="block mb-1 font-medium">Subtotal</label>
-//           <input
-//             type="number"
-//             name="subtotal"
-//             value={formData.subtotal}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+      await createInvoiceService(finalFormData, auth.token);
+      setMessage("Invoice created successfully!");
+      setTimeout(() => navigate("/"), 1000);
+    } catch (error: any) {
+      setMessage(`Error creating invoice: ${error.message}`);
+    }
+  };
 
-//         <div>
-//           <label className="block mb-1 font-medium">VAT</label>
-//           <input
-//             type="number"
-//             name="vat"
-//             value={formData.vat}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4 text-center">Create Invoice</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 flex w-full">
+        <div className="w-[45%] space-y-4">
+          <div>
+            <label className="block mb-1 font-medium">Invoice Number</label>
+            <input
+              name="invoiceNumber"
+              value={formData.invoiceNumber}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="text"
+              required
+            />
+          </div>
 
-//         <div>
-//           <label className="block mb-1 font-medium">Total Amount</label>
-//           <input
-//             type="number"
-//             name="totalAmount"
-//             value={formData.totalAmount}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
-//           <button
-//           type="submit"
-//           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-//         >
-//           Submit Invoice
-//         </button>
+          <div>
+            <label className="block mb-1 font-medium">Customer Name</label>
+            <input
+              name="customerName"
+              value={formData.customerName}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="text"
+              required
+            />
+          </div>
 
-//         {message && <p className="mt-2 text-sm text-red-600">{message}</p>}
-//         </div>
-//         <div className="w-[20%]"></div>
-//         <div className="w-[40%]">
-//         <button type="button" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={handleItems}>
-//           Add Items
-//         </button>
-//         <div>
-//           <label className="block mb-1 font-medium">Customer Name</label>
-//           <input
-//             name="customerName"
-//             value={formData.items.name}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+          <div>
+            <label className="block mb-1 font-medium">Customer Email</label>
+            <input
+              name="customerMail"
+              value={formData.customerMail}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="email"
+              required
+            />
+          </div>
 
-//         <div>
-//           <label className="block mb-1 font-medium">Customer Email</label>
-//           <input
-//             name="customerMail"
-//             value={formData.customerMail}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
+          <div>
+            <label className="block mb-1 font-medium">Company Name</label>
+            <input
+              name="companyName"
+              value={formData.companyName}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="text"
+              required
+            />
+          </div>
 
-//         <div>
-//           <label className="block mb-1 font-medium">Company Name</label>
-//           <input
-//             name="companyName"
-//             value={formData.companyName}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//         </div>
-//         </div>
-      
- 
-//       </form>
-//     </div>
-//   );
-// }
+          <div>
+            <label className="block mb-1 font-medium">Invoice Date</label>
+            <input
+              name="invoiceDate"
+              value={formData.invoiceDate}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="date"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Credit Terms</label>
+            <input
+              name="credit"
+              value={formData.credit}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="text"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Due Date</label>
+            <input
+              name="dueDate"
+              value={formData.dueDate}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              type="date"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Remark</label>
+            <textarea
+              name="remark"
+              value={formData.remark}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Bank Name</label>
+            <input
+              name="bankName"
+              value={bankData.name}
+              onChange={handleBankChange}
+              className="w-full p-2 border rounded"
+              type="text"
+            />
+          </div>
+
+          <div>
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Account Number</label>
+            <input
+              name="accountNumber"
+              value={bankData.accountNumber}
+              onChange={handleBankChange}
+              className="w-full p-2 border rounded"
+              type="text"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Submit Invoice
+          </button>
+
+          {message && <p className="text-red-600 text-sm mt-2">{message}</p>}
+        </div>
+
+        <div className="w-[10%]"></div>
+
+        <div className="w-[45%] space-y-4">
+          <h3 className="text-xl font-semibold">Add Invoice Item</h3>
+
+          <div>
+            <label className="block mb-1 font-medium">Item Name</label>
+            <input
+              name="name"
+              value={item.name}
+              onChange={handleItemChange}
+              className="w-full p-2 border rounded"
+              type="text"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Description</label>
+            <input
+              name="description"
+              value={item.description}
+              onChange={handleItemChange}
+              className="w-full p-2 border rounded"
+              type="text"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Quantity</label>
+            <input
+              name="quantity"
+              value={item.quantity}
+              onChange={handleItemChange}
+              className="w-full p-2 border rounded"
+              type="number"
+              min="0"
+              step="1"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-medium">Unit Price</label>
+            <input
+              name="unitPrice"
+              value={item.unitPrice}
+              onChange={handleItemChange}
+              className="w-full p-2 border rounded"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Add Item
+          </button>
+
+          {itemsCount.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-semibold mb-2">Items Preview</h4>
+              <ul className="space-y-2">
+                {itemsCount.map((itm, idx) => (
+                  <li key={idx} className="border p-2 rounded bg-gray-50">
+                    <p>{itm.invoiceNumber}</p>
+                    <p>
+                      <strong>{itm.name}</strong> - {itm.quantity} × ${itm.unitPrice}
+                    </p>
+                    {itm.description && (
+                      <p className="text-sm text-gray-600">{itm.description}</p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}
