@@ -38,5 +38,6 @@ class Invoice(UUIDAuditBase):
 
     bank_info: Mapped[BankInfo] = relationship(
         back_populates="invoice",
+        cascade="all,delete-orphan",
         lazy="selectin"
     )

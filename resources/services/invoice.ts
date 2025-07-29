@@ -39,6 +39,20 @@ export const createInvoiceService = async (data: API.InvoiceCreate.RequestBody, 
   }
 };
 
+export const deleteInvoiceService=async(invoiceId:string,token:string)=>{
+  if(!token) throw new Error("No auth token provided");
+  try{
+    await axios.delete(`${APP_URL}/invoice/${invoiceId}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+  }catch(error){
+    throw error
+  }
+}
+
 export const sendInvoiceEmailService = async (invoiceId: string, token: string): Promise<void> => {
   if (!token) throw new Error("No auth token provided");
 

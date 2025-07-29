@@ -1,9 +1,9 @@
 # type: ignore
-"""add invoice,invoice items, and bank info
+"""add models
 
-Revision ID: 1316a61d86e9
+Revision ID: 9e60b22b7b2c
 Revises: 
-Create Date: 2025-07-29 09:56:27.878887+00:00
+Create Date: 2025-07-29 11:30:24.746201+00:00
 
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ sa.EncryptedString = EncryptedString
 sa.EncryptedText = EncryptedText
 
 # revision identifiers, used by Alembic.
-revision = '1316a61d86e9'
+revision = '9e60b22b7b2c'
 down_revision = None
 branch_labels = None
 depends_on = None

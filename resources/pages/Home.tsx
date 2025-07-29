@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthProvider";
 import MainLayout from "@/layouts/MainLayout";
 import { useEffect, useState } from "react";
-import { getAllInvoiceService, sendInvoiceEmailService } from "@/services/invoice";
+import { deleteInvoiceService, getAllInvoiceService, sendInvoiceEmailService } from "@/services/invoice";
 import { useNavigate } from "react-router-dom";
 import type { API } from "@/types/api";
 
@@ -13,6 +13,7 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modal,setModal]=useState(false)
+  const [deleteModal,setDeleteModal]=useState(false)
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -33,7 +34,24 @@ const Home: React.FC = () => {
     };
 
     fetchInvoices();
-  }, [auth?.token]);
+  }, [auth?.token,loading,error]);
+
+  const handleDelete=async(invoiceId:string)=>{
+     if (!auth?.token) {
+      setError("No auth token found. Please log in.");
+      return;
+    }
+    try{
+      setLoading(true)
+      await deleteInvoiceService(invoiceId,auth.token);
+      setDeleteModal(true)
+    }catch(e:any){
+      console.error(e)
+     alert(`Failed to delete invoice: ${e.message}`);
+    }finally{
+      setLoading(false)
+    }
+  }
 
   const handleSendEmail = async (invoiceId: string) => {
     if (!auth?.token) {
@@ -75,10 +93,19 @@ const Home: React.FC = () => {
           Create New Invoice
         </button>
         {modal && (
-          <div className="border border-black rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-lg">
+          <div className=" rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-xl">
             <p>Email sent successfully!</p>
             <div className="flex justify-end">
               <button className="button text-white bg-blue-600 rounded-md p-2" onClick={()=>setModal(false)}>Okay</button>
+            </div>
+        </div>
+        )
+        }
+        {deleteModal && (
+          <div className=" rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-xl text-red-500">
+            <p>Invoice Deleted Successfully</p>
+            <div className="flex justify-end">
+              <button className="button text-white bg-red-600 rounded-md p-2" onClick={()=>setDeleteModal(false)}>Okay</button>
             </div>
         </div>
         )
@@ -132,6 +159,11 @@ const Home: React.FC = () => {
                           className="text-green-900 hover:underline"
                         >
                           Email
+                        </button>
+                        <button
+                        onClick={()=>handleDelete(invoice.id)}
+                        className="text-red-700 hover:underline">
+                          Delete
                         </button>
                       </td>
                     </tr>
