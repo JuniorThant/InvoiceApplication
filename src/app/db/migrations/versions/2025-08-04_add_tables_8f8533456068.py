@@ -1,9 +1,9 @@
 # type: ignore
-"""add models
+"""add tables
 
-Revision ID: 9e60b22b7b2c
+Revision ID: 8f8533456068
 Revises: 
-Create Date: 2025-07-29 11:30:24.746201+00:00
+Create Date: 2025-08-04 06:22:44.510479+00:00
 
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ sa.EncryptedString = EncryptedString
 sa.EncryptedText = EncryptedText
 
 # revision identifiers, used by Alembic.
-revision = '9e60b22b7b2c'
+revision = '8f8533456068'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -164,6 +164,22 @@ def schema_upgrades() -> None:
     sa.ForeignKeyConstraint(['invoice_number'], ['invoice.invoice_number'], name=op.f('fk_invoice_item_invoice_number_invoice'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_invoice_item'))
     )
+    op.create_table('receipt',
+    sa.Column('id', sa.GUID(length=16), nullable=False),
+    sa.Column('invoice_number', sa.String(), nullable=False),
+    sa.Column('receipt_number', sa.String(), nullable=False),
+    sa.Column('payment_date', sa.Date(), nullable=False),
+    sa.Column('receipt_date', sa.Date(), nullable=False),
+    sa.Column('payment_status', sa.String(), nullable=False),
+    sa.Column('payment_total', sa.Float(), nullable=False),
+    sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTimeUTC(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTimeUTC(timezone=True), nullable=False),
+    sa.ForeignKeyConstraint(['invoice_number'], ['invoice.invoice_number'], name=op.f('fk_receipt_invoice_number_invoice'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_receipt')),
+    sa.UniqueConstraint('receipt_number'),
+    sa.UniqueConstraint('receipt_number', name=op.f('uq_receipt_receipt_number'))
+    )
     op.create_table('team_invitation',
     sa.Column('id', sa.GUID(length=16), nullable=False),
     sa.Column('team_id', sa.GUID(length=16), nullable=False),
@@ -257,6 +273,7 @@ def schema_downgrades() -> None:
         batch_op.drop_index(batch_op.f('ix_team_invitation_email'))
 
     op.drop_table('team_invitation')
+    op.drop_table('receipt')
     op.drop_table('invoice_item')
     op.drop_table('bank_info')
     with op.batch_alter_table('user_account', schema=None) as batch_op:

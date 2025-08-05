@@ -45,5 +45,7 @@ class InvoiceService(SQLAlchemyAsyncRepositoryService[m.Invoice]):
             return await self.repository.add(invoice_instance)
     
 
+    
+
          
          

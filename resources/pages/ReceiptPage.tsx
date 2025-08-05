@@ -1,104 +1,64 @@
-import { useAuth } from "@/contexts/AuthProvider"
-import MainLayout from "@/layouts/MainLayout"
-import { useEffect, useState } from "react"
-import {
-  deleteInvoiceService,
-  getAllInvoiceService,
-  sendInvoiceEmailService,
-} from "@/services/invoice"
-import { useNavigate } from "react-router-dom"
-import type { API } from "@/types/api"
 import SideBar from "@/components/SideBar"
+import { useAuth } from "@/contexts/AuthProvider"
+import { deleteReceiptService, getAllReceiptService } from "@/services/receipt"
+import type { API } from "@/types/api"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
-const Home: React.FC = () => {
+export default function ReceiptPage() {
   const { auth } = useAuth()
-  const navigate = useNavigate()
-
-  const [invoices, setInvoices] = useState<
-    API.InvoiceList.Http200.InvoiceSummary[]
+  const [receipts, setReceipts] = useState<
+    API.ReceiptList.Http200.ReceiptSummary[]
   >([])
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [modal, setModal] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
 
+  const fetchReceipts = async () => {
+    if (!auth.token) {
+      setError("The user has not logged in, Please log in")
+      return
+    }
+    try {
+      const data = await getAllReceiptService(auth.token)
+      setLoading(true)
+      setReceipts(data.items)
+    } catch (e: any) {
+      setError(`Failed to fetch receipts: ${e.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const fetchInvoices = async () => {
-      if (!auth?.token) {
-        setError("No auth token found. Please log in.")
-        return
-      }
+    fetchReceipts()
+  }, [])
 
-      setError(null)
-      try {
-        const data = await getAllInvoiceService(auth.token)
-        setLoading(true)
-        setInvoices(data.items)
-      } catch (e: any) {
-        setError(`Failed to fetch invoices: ${e.message}`)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchInvoices()
-  }, [auth?.token])
-
-  const handleDelete = async (invoiceId: string) => {
-    if (!auth?.token) {
-      setError("No auth token found. Please log in.")
-      return
-    }
-    try {
-      setLoading(true)
-      await deleteInvoiceService(invoiceId, auth.token)
-      setDeleteModal(true)
-    } catch (e: any) {
-      console.error(e)
-      alert(`Failed to delete invoice: ${e.message}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSendEmail = async (invoiceId: string) => {
-    if (!auth?.token) {
-      setError("No auth token found. Please log in.")
-      return
-    }
-
-    try {
-      setLoading(true)
-      await sendInvoiceEmailService(invoiceId, auth.token)
-      setModal(true)
-    } catch (e: any) {
-      console.error(e)
-      alert(`Failed to send invoice email: ${e.message}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const formatAmount = (amount: unknown): string => {
+  const navigate = useNavigate()
+  const formatAmount = (amount: any) => {
     const num = Number(amount)
     if (isNaN(num)) return "0.00"
     return num.toFixed(2)
   }
 
+  const handleDelete=async(id:string)=>{
+    await deleteReceiptService(id,auth.token)
+    toast("Receipt Deleted Successfully")
+    fetchReceipts()
+  }
+
   return (
-    <MainLayout
-      title="Litestar Application - Home"
-      description="Litestar Application - Home"
-      keywords="home"
-    >
+    <div>
       <div className="flex">
         <SideBar />
         <div className="flex-1 ml-64 p-5">
           <button
-            onClick={() => navigate("/create/invoice")}
+            onClick={() => navigate("/create/receipt")}
             className="mb-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Create New Invoice
+            Create New Receipt
           </button>
           {modal && (
             <div className=" rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-xl">
@@ -127,7 +87,7 @@ const Home: React.FC = () => {
               *
             </div>
           )}
-          {loading && <p>Loading invoices...</p>}
+          {loading && <p>Loading receipts...</p>}
           {error && <p className="text-red-600">{error}</p>}
           {!loading && !error && (
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -135,38 +95,38 @@ const Home: React.FC = () => {
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
                     <th className="px-6 py-3">Invoice Number</th>
-                    <th className="px-6 py-3">Customer Name</th>
-                    <th className="px-6 py-3">Company Name</th>
-                    <th className="px-6 py-3">Invoice Date</th>
+                    <th className="px-6 py-3">Receipt Number</th>
+                    <th className="px-6 py-3">Payment Date</th>
+                    <th className="px-6 py-3">Payment Status</th>
                     <th className="px-6 py-3">Total Amount</th>
                     <th className="px-6 py-3">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.length === 0 ? (
+                  {receipts.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center">
-                        No invoices found.
+                        No receipts found.
                       </td>
                     </tr>
                   ) : (
-                    invoices.map((invoice) => (
+                    receipts.map((receipt) => (
                       <tr
-                        key={invoice.id}
+                        key={receipt.id}
                         className="odd:bg-white even:bg-gray-50 border-b dark:border-gray-700"
                       >
                         <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                          {invoice.invoiceNumber}
+                          {receipt.invoiceNumber}
                         </td>
-                        <td className="px-6 py-4">{invoice.customerName}</td>
-                        <td className="px-6 py-4">{invoice.companyName}</td>
-                        <td className="px-6 py-4">{invoice.invoiceDate}</td>
+                        <td className="px-6 py-4">{receipt.invoiceNumber}</td>
+                        <td className="px-6 py-4">{receipt.paymentDate}</td>
+                        <td className="px-6 py-4">{receipt.paymentStatus}</td>
                         <td className="px-6 py-4">
-                          ${formatAmount(invoice.totalAmount)}
+                          ${formatAmount(receipt.paymentTotal)}
                         </td>
                         <td className="px-6 py-4 space-x-2">
                           <a
-                            href={`/invoice/${invoice.id}/preview`}
+                            href={`/receipt/${receipt.id}/preview`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:underline"
@@ -174,13 +134,7 @@ const Home: React.FC = () => {
                             View
                           </a>
                           <button
-                            onClick={() => handleSendEmail(invoice.id)}
-                            className="text-green-900 hover:underline"
-                          >
-                            Email
-                          </button>
-                          <button
-                            onClick={() => handleDelete(invoice.id)}
+                            onClick={() => handleDelete(receipt.id)}
                             className="text-red-700 hover:underline"
                           >
                             Delete
@@ -195,8 +149,6 @@ const Home: React.FC = () => {
           )}
         </div>
       </div>
-    </MainLayout>
+    </div>
   )
 }
-
-export default Home

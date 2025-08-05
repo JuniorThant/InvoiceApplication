@@ -69,7 +69,7 @@ services:
     build:
       context: .
       dockerfile: deploy/docker/run/Dockerfile
-    command: pytest --maxfail=1 --disable-warnings -q
+    command: pytest 
     depends_on:
       db:
         condition: service_healthy

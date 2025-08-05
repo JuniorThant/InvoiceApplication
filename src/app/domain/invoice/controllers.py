@@ -55,6 +55,7 @@ class InvoiceController(Controller):
     ) -> OffsetPagination[m.Invoice]:
         results, total = await invoice_service.list_and_count(*filters)
         return invoice_service.to_schema(data=results, total=total, filters=filters)
+    
 
     """
     Get method: service name, id and return model
@@ -69,7 +70,8 @@ class InvoiceController(Controller):
         db_obj = await invoice_service.get(invoice_id)
         return invoice_service.to_schema(db_obj)
 
-    """
+    """        exclude={"id","create_at","updated_at"}
+
     Post method: service name, data passing with DTOData[model]
     use create, return schema
     """
@@ -86,6 +88,7 @@ class InvoiceController(Controller):
     ) -> m.Invoice:
         db_obj = await invoice_service.create(data)
         return invoice_service.to_schema(db_obj)
+    
 
     @patch(
         path=urls.INVOICE_UPDATE,
@@ -172,3 +175,5 @@ class InvoiceController(Controller):
         )
 
         return {"message": "Invoice email sent"}
+
+

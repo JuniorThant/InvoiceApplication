@@ -48,6 +48,64 @@ export namespace API {
     }
   }
 
+  export namespace ReceiptList{
+    export namespace Http200{
+      export type ResponseBody={
+        items:ReceiptSummary[];
+        pageSize:number;
+        page:number;
+        totalItems:number;
+        totalPages:number;
+      }
+      export type ReceiptSummary={
+        id:string;
+        invoiceNumber:string;
+        receiptNumber:string;
+        paymentDate:string;
+        receiptDate:string;
+        paymentStatus:string;
+        paymentTotal:number;
+        createdAt?:string;
+        updatedAt?:string;
+      }
+    }
+
+  }
+
+  export namespace ReceiptCreate{
+    export namespace Http201{
+      export type ResponseBody={
+        id:string;
+        invoiceNumber:string;
+        receiptNumber:string;
+        paymentDate:string;
+        receiptDate:string;
+        paymentStatus:string;
+        paymentTotal:string;
+        createdAt?:string;
+        updatedAt?:string;
+      }
+    }
+
+    export type ResponseBody={
+        invoiceNumber:string;
+        receiptNumber:string;
+        paymentDate:string;
+        receiptDate:string;
+        paymentStatus:string;
+        paymentTotal:string;
+    }
+
+     export type RequestBody={
+        invoiceNumber:string;
+        receiptNumber:string;
+        paymentDate:string;
+        receiptDate:string;
+        paymentStatus:string;
+        paymentTotal:string;
+    }
+  }
+
   export namespace InvoiceCreate {
     export namespace Http201 {
       export type ResponseBody = {

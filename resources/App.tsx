@@ -9,6 +9,8 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useEffect } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import CreateInvoice from "@/pages/CreateInvoice";
+import ReceiptPage from "@/pages/ReceiptPage";
+import CreateReceipt from "@/pages/CreateReceipt";
 
 const App: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +37,8 @@ const App: React.FC = () => {
         <Route element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />
           <Route path="/create/invoice" element={<CreateInvoice />} />
+          <Route path="/receipt" element={<ReceiptPage/>}/>
+          <Route path="/create/receipt" element={<CreateReceipt />} />
         </Route>
 
         {/* Catch-All */}

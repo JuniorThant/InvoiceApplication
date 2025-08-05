@@ -13,18 +13,20 @@ if TYPE_CHECKING:
 class InvoiceDTO(SQLAlchemyDTO[m.Invoice]):
     config = dto.config(
         max_nested_depth=1, 
-        exclude={"created_at", "updated_at"},
+        exclude={"created_at", "updated_at","receipt"},
     )
 
 class InvoiceCreateDTO(SQLAlchemyDTO[m.Invoice]):
     config = dto.config(
         max_nested_depth=1,  
-        exclude={"id", "created_at", "updated_at"},
+        exclude={"id", "created_at", "updated_at","receipt"},
     )
 
 class InvoiceUpdateDTO(SQLAlchemyDTO[m.Invoice]):
     config = dto.config(
         max_nested_depth=1,
-        exclude={"id", "created_at", "updated_at"},
+        exclude={"id", "created_at", "updated_at","receipt"},
         partial=True,
     )
+
+

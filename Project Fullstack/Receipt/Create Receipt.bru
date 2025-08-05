@@ -1,0 +1,23 @@
+meta {
+  name: Create Receipt
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8015/receipt
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "invoiceNumber": "INV-1009",
+    "receiptNumber": "REC-2024-001",
+    "paymentDate": "2024-10-01",
+    "receiptDate": "2024-10-01",
+    "paymentStatus": "Paid",
+    "paymentTotal": 1200.50
+  }
+  
+}

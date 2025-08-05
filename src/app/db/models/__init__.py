@@ -11,6 +11,7 @@ from .user_role import UserRole
 from .invoice import Invoice
 from .invoice_item import InvoiceItem
 from .bank_info import BankInfo
+from .receipt import Receipt
 
 __all__ = (
     "Role",
@@ -25,5 +26,6 @@ __all__ = (
     "team_tag",
     "Invoice",
     "InvoiceItem",
-    "BankInfo"
+    "BankInfo",
+    "Receipt"
 )

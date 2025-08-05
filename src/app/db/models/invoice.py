@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import String, Date, Numeric, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -11,6 +11,7 @@ from advanced_alchemy.base import UUIDAuditBase
 if TYPE_CHECKING:
     from .invoice_item import InvoiceItem
     from .bank_info import BankInfo
+    from .receipt import Receipt
 
 
 class Invoice(UUIDAuditBase):
@@ -40,4 +41,10 @@ class Invoice(UUIDAuditBase):
         back_populates="invoice",
         cascade="all,delete-orphan",
         lazy="selectin"
+    )
+
+    receipt:Mapped[Optional[Receipt]]=relationship(
+        back_populates="invoice",
+        lazy="selectin",
+        uselist=False
     )

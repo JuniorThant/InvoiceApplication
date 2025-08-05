@@ -12,9 +12,9 @@ post {
 
 body:json {
   {
-    "invoiceNumber": "INV-1006",
-    "customerName": "Mr Criz",
-    "customerMail":"junior@gmail.com",
+    "invoiceNumber": "INV-1009",
+    "customerName": "Mr Kaung Zin Thant",
+    "customerMail":"kaungzinthant12@gmail.com",
     "companyName": "Doe Ltd",
     "invoiceDate": "2025-07-24",
     "credit": "30 days",
@@ -23,7 +23,7 @@ body:json {
     "items": [
       {
         "invoiceItemId": "ITEM-001",
-        "invoiceNumber": "INV-1006",
+        "invoiceNumber": "INV-1009",
         "name": "Monitor",
         "description": "24-inch LED Monitor",
         "quantity": 1,
@@ -31,13 +31,19 @@ body:json {
       },
       {
         "invoiceItemId": "ITEM-002",
-        "invoiceNumber": "INV-1006",
+        "invoiceNumber": "INV-1009",
         "name": "Wireless Mouse",
         "description": "Ergonomic wireless mouse",
         "quantity": 2,
         "unitPrice": 10.00
       }
-    ]
+    ],
+    "bankInfo":{
+      "invoiceNumber":"INV-1009",
+      "bankName":"DBS Bank",
+      "swift":"DBSE9434",
+      "accountNumber":"SA8433748878"
+    }
   }
   
 }

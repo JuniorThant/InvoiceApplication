@@ -72,11 +72,13 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         from app.domain.tags.controllers import TagController
         from app.domain.teams import signals as team_signals
         from app.domain.invoice.controllers import InvoiceController
+        from app.domain.receipt.controllers import ReceiptController
         from app.domain.teams.controllers import TeamController, TeamMemberController
         from app.domain.teams.services import TeamMemberService, TeamService
         from app.domain.web.controllers import WebController
         from app.lib.exceptions import ApplicationError, exception_to_http_response
         from app.server import plugins
+        from litestar.static_files import StaticFilesConfig
 
         settings = get_settings()
         self.redis = settings.redis.get_client()
@@ -121,7 +123,8 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                 TeamMemberController,
                 TagController,
                 WebController,
-                InvoiceController
+                InvoiceController,
+                ReceiptController
             ],
         )
         # signatures

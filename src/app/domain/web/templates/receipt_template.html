@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Template - Neural Dev Co., LTD</title>
+    <title>Receipt Template - Neural Dev Co., LTD</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -117,7 +117,7 @@
         
         .bottom-section {
             display: flex;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         
         .remark-section {
@@ -172,7 +172,6 @@
 
         .signature-section table, .signature-section tr, .signature-section td{
             height: 40px;
-            display: relative;
         }
         
         .signature-line {
@@ -185,11 +184,6 @@
             display: flex;
             margin:10px;
             justify-content: space-between;
-        }
-
-        .image{
-            display: flex;
-            width: 20%;
         }
         
         @media print {
@@ -206,7 +200,7 @@
             <div class="logo">N</div>
             <div class="company-info">
                 <h1>NEURAL DEV CO.,LTD</h1>
-                <p>Address : 55/15 Moo5 Tambol Mueng<br>       https://www.signwell.com/assets/vip-signatures/muhammad-ali-signature-3f9237f6fc48c3a04ba083117948e16ee7968aae521ae4ccebdfb8f22596ad22.svg   
+                <p>Address : 55/15 Moo5 Tambol Mueng<br>
                 Amphor Mueng Chonburi , Chonburi , 20130</p>
             </div>
         </div>
@@ -214,17 +208,16 @@
         <table class="invoice-details">
             <tr>
                 <td class="label">NEURAL DEV CO.,LTD</td>
-                <td rowspan="3" class="label">Invoice Number : {{ invoice.invoice_number }} <br>
-                    Invoice Date : {{ invoice.invoice_date.strftime('%d/%m/%Y') }} <br>
-                    Credit : {{ invoice.credit }} <br>
-                    Due Date : {{ invoice.due_date.strftime('%d/%m/%Y') }}
+                <td rowspan="3" class="label">Receipt Number : {{ receipt.receipt_number }} <br>
+                    Receipt Date : {{ receipt.receipt_date.strftime('%d/%m/%Y') }} <br>
+                    Payment Date : {{ receipt.payment_date.strftime('%d/%m/%Y') }}
                 </td>
             </tr>
             <tr>
-                <td class="label">Customer / Buyer : {{ invoice.customer_name }}</td>
+                <td class="label">Customer / Buyer : {{ receipt.invoice.customer_name }}</td>
             </tr>
             <tr>
-                <td class="label">Name / Company : {{ invoice.company_name }}</td>
+                <td class="label">Name / Company : {{ receipt.invoice.company_name }}</td>
             </tr>
         </table>
         
@@ -239,7 +232,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in invoice.items %}
+                {% for item in receipt.invoice.items %}
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td class="desc-col">
@@ -252,11 +245,11 @@
                 </tr>
                 {% endfor %}
                 
-                <!-- {% for i in range(4 - invoice.items|length) %}
+                {% for i in range(4 - receipt.invoice.items|length) %}
                 {% if i >= 0 %}
                 <tr><td></td><td></td><td></td><td></td><td></td></tr>
                 {% endif %}
-                {% endfor %} -->
+                {% endfor %}
             </tbody>
         </table>
         
@@ -264,22 +257,22 @@
             <div class="remark-section">
                 <div class="remark-box">
                     <strong>Remark : </strong><br>
-                    {{ invoice.remark }}
+                    {{ receipt.invoice.remark }}
                 </div>
             </div>
             <div class="summary-section">
                 <table class="summary-table">
                     <tr>
                         <td class="label">Sub Total :</td>
-                        <td>{{ "%.2f"|format(invoice.subtotal) }}</td>
+                        <td>{{ "%.2f"|format(receipt.invoice.subtotal) }}</td>
                     </tr>
                     <tr>
                         <td class="label">VAT :</td>
-                        <td>{{ "%.2f"|format(invoice.vat) }}</td>
+                        <td>{{ "%.2f"|format(receipt.invoice.vat) }}</td>
                     </tr>
                     <tr>
                         <td class="label">Total Amount :</td>
-                        <td><strong>{{ "%.2f"|format(invoice.total_amount) }}</strong></td>
+                        <td><strong>{{ "%.2f"|format(receipt.invoice.total_amount) }}</strong></td>
                     </tr>
                 </table>
             </div>
@@ -289,30 +282,18 @@
             <tr>
                 <td class="payment-method">
                     <div>
-                        <strong>Payment Method:</strong>
-                        <p>Bank Name: {{invoice.bank_info.bank_name}}</p>
-                        <p>Swift Number: {{invoice.bank_info.swift}}</p>
-                        <p>Account Number: {{invoice.bank_info.account_number}}</p>
+                        <strong>Receipt Status:</strong>
+                        <p>Paid</p>
                     </div>
                 </td>
                 <td>
-                    <strong>For Customer</strong><br><br>
-                    <div class="date-line">
-                        <p>___/___/___<br>
-                        Date</p>
-                        <p>              _______________________<br>
-                    Signature</p>
-              
-                    </div>
+                    <strong>Payment Amount:</strong><br><br><br><br>
+                        <p>{{"%.2f"|format(receipt.payment_total)}}</p>
                 </td>
                 <td>
-                    <strong>For Neural Dev Co.,LTD</strong><br><br>
-                    <div class="date-line">
-                       <p class="">
-                         <img class="image" src="https://www.signwell.com/assets/vip-signatures/muhammad-ali-signature-3f9237f6fc48c3a04ba083117948e16ee7968aae521ae4ccebdfb8f22596ad22.svg" alt="signature" /><br>
+                    <strong>For Neural Dev Co.,LTD</strong><br><br><br><br><br>
+                    <div class="signature-line"></div>
                     Authorized Signature
-                       </p>
-                    </div>
                 </td>
             </tr>
         </table>

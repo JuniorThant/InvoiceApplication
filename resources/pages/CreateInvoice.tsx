@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { createInvoiceService } from "@/services/invoice";
+import React, { useEffect, useState } from "react";
+import { createInvoiceService, getAllInvoiceService } from "@/services/invoice";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthProvider";
 import { API } from "@/types/api";
@@ -18,43 +18,32 @@ export default function CreateInvoice() {
     dueDate: "",
     remark: "",
     items: [],
-    bankInfo:{
-      invoiceNumber:"",
-      bankName:"",
-      swift:"",
-      accountNumber:""
+    bankInfo: {
+      invoiceNumber: "",
+      bankName: "",
+      swift: "",
+      accountNumber: ""
     }
   });
 
-  const [bankData,setBankData]=useState<{
-    invoiceNumber:string;
-    bankName:string;
-    swift:string;
-    accountNumber:string;
-  }>({
-    invoiceNumber:"",
-    bankName:"",
-    swift:"",
-    accountNumber:""
-  })
+  const [bankData, setBankData] = useState({
+    invoiceNumber: "",
+    bankName: "",
+    swift: "",
+    accountNumber: ""
+  });
 
-  const [item, setItem] = useState<{
-    invoiceNumber:string;
-    name: string;
-    description: string;
-    quantity: string | number;
-    unitPrice: string | number;
-  }>({
-    invoiceNumber:"",
+  const [item, setItem] = useState({
+    invoiceNumber: "",
     name: "",
     description: "",
     quantity: "",
-    unitPrice: "",
+    unitPrice: ""
   });
 
   const [itemsCount, setItemsCount] = useState<
     {
-      invoiceNumber:string;
+      invoiceNumber: string;
       name: string;
       description: string;
       quantity: number;
@@ -64,29 +53,67 @@ export default function CreateInvoice() {
 
   const [message, setMessage] = useState("");
 
+  const getNextInvoiceId=(invoices:{invoiceNumber:string}[]):string=>{
+    if(!invoices.length) return "INV-0000001";
+
+    const max=invoices.reduce((maxNum,curr)=>{
+      const num=parseInt(curr.invoiceNumber.replace("INV-",""),10);
+      return num>maxNum?num:maxNum;
+    },0)
+    const next=max+1;
+    return `INV-${next.toString().padStart(7,"0")}`;
+  }
+
+  useEffect(() => {
+  const generateInvoiceId = async () => {
+    try {
+      if (!auth?.token) return;
+
+      const res = await getAllInvoiceService(auth.token);
+      const invoices = res.items || [];
+      const nextId = getNextInvoiceId(invoices);
+
+      setFormData((prev) => ({
+        ...prev,
+        invoiceNumber: nextId,
+      }));
+
+      setBankData((prev) => ({
+        ...prev,
+        invoiceNumber: nextId,
+      }));
+    } catch (err) {
+      console.error("Failed to generate invoice number:", err);
+    }
+  };
+
+  generateInvoiceId();
+}, [auth?.token]);
+
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
-    setBankData((prev)=>({
+    setBankData((prev) => ({
       ...prev,
-      invoiceNumber:formData.invoiceNumber
-    }))
+      invoiceNumber: formData.invoiceNumber
+    }));
   };
 
-  const handleBankChange=(
-    e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  )=>{
-    const {name,value}=e.target;
-    setBankData((prev)=>({
+  const handleBankChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setBankData((prev) => ({
       ...prev,
-      [name]: value,
-    }))
-  }
+      [name]: value
+    }));
+  };
 
   const handleItemChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -96,7 +123,7 @@ export default function CreateInvoice() {
       ...prev,
       [name]: ["quantity", "unitPrice"].includes(name)
         ? value === "" ? "" : parseFloat(value)
-        : value,
+        : value
     }));
   };
 
@@ -115,21 +142,22 @@ export default function CreateInvoice() {
     setItemsCount((prev) => [
       ...prev,
       {
-        invoiceNumber:formData.invoiceNumber,
+        invoiceNumber: formData.invoiceNumber,
         name: item.name,
         description: item.description,
         quantity: Number(item.quantity),
-        unitPrice: Number(item.unitPrice),
-      },
+        unitPrice: Number(item.unitPrice)
+      }
     ]);
 
     setItem({
-      invoiceNumber:"",
+      invoiceNumber: "",
       name: "",
       description: "",
       quantity: "",
-      unitPrice: "",
+      unitPrice: ""
     });
+
     setMessage("");
   };
 
@@ -144,8 +172,8 @@ export default function CreateInvoice() {
     try {
       const finalFormData = {
         ...formData,
-        bankInfo:bankData,
-        items: itemsCount,
+        bankInfo: bankData,
+        items: itemsCount
       };
 
       await createInvoiceService(finalFormData, auth.token);
@@ -170,6 +198,7 @@ export default function CreateInvoice() {
               className="w-full p-2 border rounded"
               type="text"
               required
+              readOnly
             />
           </div>
 
@@ -266,7 +295,7 @@ export default function CreateInvoice() {
             />
           </div>
 
-              <div>
+          <div>
             <label className="block mb-1 font-medium">Swift Number</label>
             <input
               name="swift"
