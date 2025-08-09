@@ -9,7 +9,6 @@ MAILTRAP_USER = "254e5790826d47"
 MAILTRAP_PASS = "f74b2140e411aa"
 SENDER = "neuraldev@example.com"  
 
-
 """Send receipt email function"""
 def send_receipt_email(to: str, subject: str, html_body: str):
     msg = MIMEMultipart("alternative")
