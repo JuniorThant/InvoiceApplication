@@ -4,7 +4,7 @@ export default function SideBar() {
 
   return (
     <div className="w-64 h-screen bg-gray-100 text-gray-800 p-4 border-r fixed top-0 left-0 z-40 overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-8 text-gray-900">Kraken</h2>
+      <h2 className="text-2xl font-bold mb-8 text-gray-900">Invoice System</h2>
       <nav>
         <ul>
           <li>

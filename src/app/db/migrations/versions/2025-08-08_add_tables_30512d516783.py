@@ -1,9 +1,9 @@
 # type: ignore
 """add tables
 
-Revision ID: 8f8533456068
+Revision ID: 30512d516783
 Revises: 
-Create Date: 2025-08-04 06:22:44.510479+00:00
+Create Date: 2025-08-08 07:09:34.808740+00:00
 
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ sa.EncryptedString = EncryptedString
 sa.EncryptedText = EncryptedText
 
 # revision identifiers, used by Alembic.
-revision = '8f8533456068'
+revision = '30512d516783'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -64,6 +64,7 @@ def schema_upgrades() -> None:
     sa.Column('subtotal', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('vat', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('signature_url', sa.String(length=255), nullable=True),
     sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTimeUTC(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTimeUTC(timezone=True), nullable=False),
@@ -170,7 +171,7 @@ def schema_upgrades() -> None:
     sa.Column('receipt_number', sa.String(), nullable=False),
     sa.Column('payment_date', sa.Date(), nullable=False),
     sa.Column('receipt_date', sa.Date(), nullable=False),
-    sa.Column('payment_status', sa.String(), nullable=False),
+    sa.Column('payment_status', sa.Enum('PAID', 'UNPAID', name='paymentenum'), nullable=False),
     sa.Column('payment_total', sa.Float(), nullable=False),
     sa.Column('sa_orm_sentinel', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTimeUTC(timezone=True), nullable=False),

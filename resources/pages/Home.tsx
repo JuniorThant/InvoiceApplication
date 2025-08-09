@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import type { API } from "@/types/api"
 import SideBar from "@/components/SideBar"
+import { toast } from "sonner"
 
 const Home: React.FC = () => {
   const { auth } = useAuth()
@@ -19,20 +20,29 @@ const Home: React.FC = () => {
   >([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [modal, setModal] = useState(false)
-  const [deleteModal, setDeleteModal] = useState(false)
+  const [searchTerm,setSearchTerm]=useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchInvoices = async () => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+      const fetchInvoices = async () => {
       if (!auth?.token) {
         setError("No auth token found. Please log in.")
         return
       }
 
+      setLoading(true)
       setError(null)
       try {
-        const data = await getAllInvoiceService(auth.token)
-        setLoading(true)
+        const data = await getAllInvoiceService(auth.token,debouncedSearchTerm)
         setInvoices(data.items)
       } catch (e: any) {
         setError(`Failed to fetch invoices: ${e.message}`)
@@ -41,18 +51,23 @@ const Home: React.FC = () => {
       }
     }
 
+
+  useEffect(() => {
+
     fetchInvoices()
-  }, [auth?.token])
+  }, [auth?.token,debouncedSearchTerm])
 
   const handleDelete = async (invoiceId: string) => {
     if (!auth?.token) {
       setError("No auth token found. Please log in.")
       return
     }
+    
     try {
       setLoading(true)
       await deleteInvoiceService(invoiceId, auth.token)
-      setDeleteModal(true)
+      toast("Invoice Deleted Successfully")
+      fetchInvoices()
     } catch (e: any) {
       console.error(e)
       alert(`Failed to delete invoice: ${e.message}`)
@@ -70,7 +85,7 @@ const Home: React.FC = () => {
     try {
       setLoading(true)
       await sendInvoiceEmailService(invoiceId, auth.token)
-      setModal(true)
+      toast("Email sent successfully")
     } catch (e: any) {
       console.error(e)
       alert(`Failed to send invoice email: ${e.message}`)
@@ -100,33 +115,15 @@ const Home: React.FC = () => {
           >
             Create New Invoice
           </button>
-          {modal && (
-            <div className=" rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-xl">
-              <p>Email sent successfully!</p>
-              <div className="flex justify-end">
-                <button
-                  className="button text-white bg-blue-600 rounded-md p-2"
-                  onClick={() => setModal(false)}
-                >
-                  Okay
-                </button>
-              </div>
-            </div>
-          )}
-          {deleteModal && (
-            <div className=" rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-xl text-red-500">
-              <p>Invoice Deleted Successfully</p>
-              <div className="flex justify-end">
-                <button
-                  className="button text-white bg-red-600 rounded-md p-2"
-                  onClick={() => setDeleteModal(false)}
-                >
-                  Okay
-                </button>
-              </div>
-              *
-            </div>
-          )}
+          <div className="w-1/3"> 
+          <input type="text" 
+          className="w-full px-4 py-2 border rounded-md my-2"
+          placeholder="Search Requests"
+          value={searchTerm}
+          onChange={(e)=>setSearchTerm(e.target.value)}
+          />
+          </div>
+
           {loading && <p>Loading invoices...</p>}
           {error && <p className="text-red-600">{error}</p>}
           {!loading && !error && (
@@ -158,8 +155,8 @@ const Home: React.FC = () => {
                         <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                           {invoice.invoiceNumber}
                         </td>
-                        <td className="px-6 py-4">{invoice.customerName}</td>
-                        <td className="px-6 py-4">{invoice.companyName}</td>
+                        <td className="px-6 py-4 capitalize">{invoice.customerName}</td>
+                        <td className="px-6 py-4 capitalize">{invoice.companyName}</td>
                         <td className="px-6 py-4">{invoice.invoiceDate}</td>
                         <td className="px-6 py-4">
                           ${formatAmount(invoice.totalAmount)}
@@ -200,3 +197,4 @@ const Home: React.FC = () => {
 }
 
 export default Home
+

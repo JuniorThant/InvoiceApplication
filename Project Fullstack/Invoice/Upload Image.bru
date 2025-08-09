@@ -1,0 +1,19 @@
+meta {
+  name: Upload Image
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8015/invoice/1a4e241d-7d5d-4258-b59f-b5123e85f0b0/signature
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  file: @file(/home/kaung/Downloads/sign.png) @contentType(image/png)
+}
+
+body:file {
+  file: @file(/home/kaung/Downloads/sign.png) @contentType(image/png)
+}

@@ -1,6 +1,6 @@
 import SideBar from "@/components/SideBar"
 import { useAuth } from "@/contexts/AuthProvider"
-import { deleteReceiptService, getAllReceiptService } from "@/services/receipt"
+import { deleteReceiptService, getAllReceiptService, sendReceiptEmailService } from "@/services/receipt"
 import type { API } from "@/types/api"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -15,15 +15,27 @@ export default function ReceiptPage() {
   const [error, setError] = useState<string | null>(null)
   const [modal, setModal] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
+    const [searchTerm,setSearchTerm]=useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   const fetchReceipts = async () => {
     if (!auth.token) {
       setError("The user has not logged in, Please log in")
       return
     }
+    setLoading(true)
     try {
-      const data = await getAllReceiptService(auth.token)
-      setLoading(true)
+      const data = await getAllReceiptService(auth.token,debouncedSearchTerm)
       setReceipts(data.items)
     } catch (e: any) {
       setError(`Failed to fetch receipts: ${e.message}`)
@@ -34,7 +46,25 @@ export default function ReceiptPage() {
 
   useEffect(() => {
     fetchReceipts()
-  }, [])
+  }, [debouncedSearchTerm])
+
+    const handleSendEmail = async (receiptId: string) => {
+      if (!auth?.token) {
+        setError("No auth token found. Please log in.")
+        return
+      }
+  
+      try {
+        setLoading(true)
+        await sendReceiptEmailService(receiptId, auth.token)
+        toast("Email sent successfully")
+      } catch (e: any) {
+        console.error(e)
+        alert(`Failed to send receipt email: ${e.message}`)
+      } finally {
+        setLoading(false)
+      }
+    }
 
   const navigate = useNavigate()
   const formatAmount = (amount: any) => {
@@ -60,6 +90,15 @@ export default function ReceiptPage() {
           >
             Create New Receipt
           </button>
+          <div className="w-1/3"> 
+          <input type="text" 
+          className="w-full px-4 py-2 border rounded-md my-2"
+          placeholder="Search Requests"
+          value={searchTerm}
+          onChange={(e)=>setSearchTerm(e.target.value)}
+          />
+          {searchTerm}
+          </div>
           {modal && (
             <div className=" rounded-md p-3 w-[20%] top-[40%] left-[40%] z-10 absolute bg-white shadow-xl">
               <p>Email sent successfully!</p>
@@ -94,8 +133,8 @@ export default function ReceiptPage() {
               <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
-                    <th className="px-6 py-3">Invoice Number</th>
                     <th className="px-6 py-3">Receipt Number</th>
+                    <th className="px-6 py-3">Invoice Number</th>
                     <th className="px-6 py-3">Payment Date</th>
                     <th className="px-6 py-3">Payment Status</th>
                     <th className="px-6 py-3">Total Amount</th>
@@ -116,11 +155,11 @@ export default function ReceiptPage() {
                         className="odd:bg-white even:bg-gray-50 border-b dark:border-gray-700"
                       >
                         <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                          {receipt.invoiceNumber}
+                          {receipt.receiptNumber}
                         </td>
                         <td className="px-6 py-4">{receipt.invoiceNumber}</td>
                         <td className="px-6 py-4">{receipt.paymentDate}</td>
-                        <td className="px-6 py-4">{receipt.paymentStatus}</td>
+                        <td className="px-6 py-4 capitalize">{receipt.paymentStatus}</td>
                         <td className="px-6 py-4">
                           ${formatAmount(receipt.paymentTotal)}
                         </td>
@@ -133,6 +172,12 @@ export default function ReceiptPage() {
                           >
                             View
                           </a>
+                          <button
+                            onClick={() => handleSendEmail(receipt.id)}
+                            className="text-green-900 hover:underline"
+                          >
+                            Email
+                          </button>
                           <button
                             onClick={() => handleDelete(receipt.id)}
                             className="text-red-700 hover:underline"

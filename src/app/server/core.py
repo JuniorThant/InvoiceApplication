@@ -79,6 +79,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         from app.lib.exceptions import ApplicationError, exception_to_http_response
         from app.server import plugins
         from litestar.static_files import StaticFilesConfig
+        from pathlib import Path
 
         settings = get_settings()
         self.redis = settings.redis.get_client()
@@ -97,6 +98,11 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         app_config = jwt_auth.on_app_init(app_config)
         # security
         app_config.cors_config = config.cors
+
+        app_config.static_files_config = [
+           StaticFilesConfig(directories=[Path(__file__).parent.parent.parent / "static"], path="/assets")
+        ]
+
         # templates
         app_config.template_config = config.templates
         # plugins

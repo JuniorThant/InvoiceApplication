@@ -5,9 +5,10 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 from advanced_alchemy.service import OffsetPagination
-from litestar import Controller, get, post, delete, patch
+from litestar import Controller, get, post, delete
 from litestar.params import Dependency, Parameter
 from litestar.response import Response
+from sqlalchemy import ColumnElement,or_
 
 from app.db import models as m
 from app.domain.accounts.guards import requires_active_user
@@ -48,8 +49,16 @@ class ReceiptController(Controller):
     async def list_receipts(
         self,
         receipt_service:ReceiptService,
-        filters:Annotated[list[FilterTypes],Dependency(skip_validation=True)]
+        search_term:str | None
     )->OffsetPagination[m.Receipt]:
+        
+        filters:list[ColumnElement[bool]]=[]
+        filters.append(
+            or_(
+                (m.Receipt.receipt_number.ilike(f"%{search_term}%")),
+                (m.Receipt.invoice_number.ilike(f"%{search_term}%")),
+            )
+        )
         results,total=await receipt_service.list_and_count(*filters)
         return receipt_service.to_schema(data=results,total=total,filters=filters)
     
@@ -76,11 +85,11 @@ class ReceiptController(Controller):
     """
     @delete(
         path=urls.RECEIPT_DELETE,
-        operation_id="DeleteInvoice",
+        operation_id="DeleteReceipt",
         return_dto=None,
         guards=[requires_active_user],
     )
-    async def delete_invoice(
+    async def delete_receipt(
         self,
         receipt_service: ReceiptService,
         receipt_id: Annotated[UUID, Parameter(title="Receipt ID")],
@@ -106,36 +115,36 @@ class ReceiptController(Controller):
         receipt=await receipt_service.get(receipt_id)
         html=self.render_receipt_html(receipt)
         return Response(content=html,media_type="text/html")
+    
+    """
+    render email template and send email
+    """
+    @post(path="/receipt/{receipt_id:uuid}/send",operation_id="SendReceiptEmail")
+    async def send_receipt_email_route(
+        self,
+        receipt_service:ReceiptService,
+        receipt_id:Annotated[UUID,Parameter(title="Receipt ID")]
+    )->dict:
+        from .utils import send_receipt_email
 
-    # """
-    # render email template and send email
-    # """
-    # @post(path="/invoice/{invoice_id:uuid}/send", operation_id="SendInvoiceEmail")
-    # async def send_invoice_email_route(
-    #     self,
-    #     invoice_service: InvoiceService,
-    #     invoice_id: Annotated[UUID, Parameter(title="Invoice ID")],
-    # ) -> dict:
-    #     from .utils import send_invoice_email  
+        receipt=await receipt_service.get(receipt_id)
 
-    #     invoice = await invoice_service.get(invoice_id)
+        receipt_html=self.render_receipt_html(receipt)
 
-    #     #render html invoice
-    #     invoice_html = self.render_invoice_html(invoice)
+        email_template_path=Path(__file__).parent.parent / "web" / "templates"/ "receipt_email_template.html"
+        env=Environment(loader=FileSystemLoader(email_template_path.parent))
+        template=env.get_template(email_template_path.name)
 
-    #     #wrap with email emplate
-    #     email_template_path = Path(__file__).parent.parent / "web" / "templates" / "invoice_email_template.html"
-    #     env = Environment(loader=FileSystemLoader(email_template_path.parent))
-    #     template = env.get_template(email_template_path.name)
+        final_html=template.render(receipt=receipt,receipt_html=receipt_html)
 
-    #     #get final email template
-    #     final_html = template.render(invoice=invoice, invoice_html=invoice_html)
+        if not receipt.invoice:
+            raise ValueError(f"Receipt {receipt_id} has no associated invoice.")
 
-    #     #send email
-    #     send_invoice_email(
-    #         to=invoice.customer_mail,  
-    #         subject=f"Invoice #{invoice.invoice_number} from Neural Dev Co., LTD",
-    #         html_body=final_html,
-    #     )
+        send_receipt_email(
+            to=receipt.invoice.customer_mail,
+            subject=f"Receipt #{receipt.receipt_number} from Neural Dev Co., LTD",
+            html_body=final_html
+        )
 
-    #     return {"message": "Invoice email sent"}
+        return{"message":"Receipt Email Sent"}
+

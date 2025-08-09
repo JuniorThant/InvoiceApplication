@@ -11,10 +11,10 @@
 </head>
 <body>
   <div class="email-wrapper">
-    <p class="message">Dear {{ invoice.customer_name }},</p>
-    <p class="message">Please find your invoice below.</p>
+    <p class="message">Dear {{ receipt.invoice.customer_name }},</p>
+    <p class="message">Please find your receipt below.</p>
     <div >
-      {{ invoice_html | safe }}
+      {{ receipt_html | safe }}
     </div>
     <p class="message">Best regards,<br class="message">Hexcode Technologies</p>
   </div>

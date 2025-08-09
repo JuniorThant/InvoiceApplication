@@ -3,6 +3,7 @@ import { createInvoiceService, getAllInvoiceService } from "@/services/invoice";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthProvider";
 import { API } from "@/types/api";
+import { toast } from "sonner";
 
 export default function CreateInvoice() {
   const { auth } = useAuth();
@@ -51,7 +52,6 @@ export default function CreateInvoice() {
     }[]
   >([]);
 
-  const [message, setMessage] = useState("");
 
   const getNextInvoiceId=(invoices:{invoiceNumber:string}[]):string=>{
     if(!invoices.length) return "INV-0000001";
@@ -135,7 +135,7 @@ export default function CreateInvoice() {
       isNaN(Number(item.quantity)) ||
       isNaN(Number(item.unitPrice))
     ) {
-      setMessage("Please fill all item fields before adding.");
+      toast("Please fill all item fields before adding.");
       return;
     }
 
@@ -158,14 +158,13 @@ export default function CreateInvoice() {
       unitPrice: ""
     });
 
-    setMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!auth?.token) {
-      setMessage("Unauthorized.");
+      toast("Unauthorized.");
       return;
     }
 
@@ -177,10 +176,10 @@ export default function CreateInvoice() {
       };
 
       await createInvoiceService(finalFormData, auth.token);
-      setMessage("Invoice created successfully!");
+      toast("Invoice Created Successfully")
       setTimeout(() => navigate("/"), 1000);
     } catch (error: any) {
-      setMessage(`Error creating invoice: ${error.message}`);
+      toast(`Error creating invoice: ${error.message}`);
     }
   };
 
@@ -323,8 +322,6 @@ export default function CreateInvoice() {
           >
             Submit Invoice
           </button>
-
-          {message && <p className="text-red-600 text-sm mt-2">{message}</p>}
         </div>
 
         <div className="w-[10%]"></div>

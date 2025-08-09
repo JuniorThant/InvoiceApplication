@@ -19,7 +19,7 @@ class InvoiceDTO(SQLAlchemyDTO[m.Invoice]):
 class InvoiceCreateDTO(SQLAlchemyDTO[m.Invoice]):
     config = dto.config(
         max_nested_depth=1,  
-        exclude={"id", "created_at", "updated_at","receipt"},
+        exclude={"id", "created_at", "updated_at","receipt","signature_url"},
     )
 
 class InvoiceUpdateDTO(SQLAlchemyDTO[m.Invoice]):

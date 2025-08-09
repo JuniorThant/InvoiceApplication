@@ -10,9 +10,8 @@ MAILTRAP_PASS = "f74b2140e411aa"
 SENDER = "neuraldev@example.com"  
 
 
-"""Send invoice email function"""
-def send_invoice_email(to: str, subject: str, html_body: str):
-    
+"""Send receipt email function"""
+def send_receipt_email(to: str, subject: str, html_body: str):
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = SENDER
@@ -27,17 +26,3 @@ def send_invoice_email(to: str, subject: str, html_body: str):
         print("Email sent successfully.")
     except Exception as e:
         print(f"Email send failed: {e}")
-
-
-import cloudinary
-
-import cloudinary
-
-def configure_cloudinary():
-    cloudinary.config(
-        cloud_name="Invoice",
-        api_key="281978128992832",
-        api_secret="H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8",
-        secure=True  
-    )
-

@@ -4,220 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt Template - Neural Dev Co., LTD</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            font-size: 12px;
-            line-height: 1.4;
-            color: #000;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-        }
-        
-        /* Header Section */
-        .header {
-            text-align: left;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo {
-            width: 60px;
-            height: 60px;
-            background: #1e40af;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 24px;
-            margin-right: 20px;
-        }
-        
-        .company-info h1 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-            color: #1e40af;
-        }
-        
-        .company-info p {
-            margin: 5px 0 0 0;
-            font-size: 11px;
-            color: #666;
-        }
-        
-        .invoice-details {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        
-        .invoice-details td {
-            border: 1px solid #000;
-            padding: 8px;
-            font-size: 11px;
-        }
-        
-        .invoice-details .label {
-            background: #f8f9fa;
-            font-weight: normal;
-            width: 25%;
-        }
-        
-        .invoice-details .value {
-            width: 25%;
-        }
-        
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        
-        .items-table th,
-        .items-table td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: center;
-            font-size: 11px;
-        }
-        
-        .items-table th {
-            background: #f8f9fa;
-            font-weight: bold;
-        }
-        
-        .items-table .desc-col {
-            text-align: left;
-            width: 40%;
-        }
-        
-        .items-table .no-col {
-            width: 8%;
-        }
-        
-        .items-table .price-col,
-        .items-table .qty-col,
-        .items-table .amount-col {
-            width: 15%;
-        }
-        
-        .items-table tbody tr {
-            height: 30px;
-        }
-        
-        .bottom-section {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        
-        .remark-section {
-            flex: 1;
-            margin-right: 20px;
-        }
-        
-        .remark-box {
-            border: 1px solid #000;
-            padding: 8px;
-            height: 80px;
-            font-size: 11px;
-        }
-        
-        .summary-section {
-            width: 300px;
-        }
-        
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .summary-table td {
-            border: 1px solid #000;
-            padding: 8px;
-            font-size: 11px;
-        }
-        
-        .summary-table .label {
-            background: #f8f9fa;
-            width: 60%;
-        }
-        
-        .signature-section {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .signature-section td {
-            border: 1px solid #000;
-            padding: 5px;
-            vertical-align: top;
-            width: 33.33%;
-            font-size: 11px;
-            height: 20px;
-        }
-        
-        .signature-section .payment-method {
-            background: #f8f9fa;
-        }
+     <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #000;
+    }
 
-        .signature-section table, .signature-section tr, .signature-section td{
-            height: 40px;
-        }
-        
-        .signature-line {
-            margin-top: 40px;
-            border-bottom: 1px solid #000;
-            width: 150px;
-        }
-        
-        .date-line {
-            display: flex;
-            margin:10px;
-            justify-content: space-between;
-        }
-        
-        @media print {
-            body {
-                margin: 0;
-                padding: 10px;
-            }
-        }
-    </style>
+    .container {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    background: white;
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    padding: 20px; /* Optional: adds space inside */
+    }
+
+
+    .header {
+      text-align: left;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 24px;
+      margin-right: 20px;
+    }
+
+    .company-info h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+      color: #1e40af;
+    }
+
+    .company-info p {
+      margin: 5px 0 0 0;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .invoice-details,
+    .items-table,
+    .summary-table,
+    .signature-section {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .invoice-details td,
+    .items-table th,
+    .items-table td,
+    .summary-table td,
+    .signature-section td {
+      border: 1px solid #000;
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    .invoice-details .label,
+    .summary-table .label,
+    .items-table th,
+    .signature-section .payment-method {
+      background: #f8f9fa;
+    }
+
+    .items-table th {
+      font-weight: bold;
+    }
+
+    .items-table .desc-col {
+      text-align: left;
+      width: 40%;
+    }
+
+    .items-table .no-col {
+      width: 8%;
+    }
+
+    .items-table .price-col,
+    .items-table .qty-col,
+    .items-table .amount-col {
+      width: 15%;
+    }
+
+    .bottom-section {
+      display: flex;
+      gap: 20px;
+    }
+
+    .remark-section {
+      flex: 1;
+    }
+
+    .remark-box {
+      border: 1px solid #000;
+      padding: 8px;
+      height: 80px;
+      font-size: 11px;
+    }
+
+    .summary-section {
+      width: 300px;
+    }
+
+    .camel{
+        text-transform: capitalize;
+    }
+
+    .signature-section td {
+      vertical-align: top;
+      width: 33.33%;
+      height: 100px;
+    }
+
+    .sign-image {
+      width: 80px;
+    }
+
+    .date-line {
+      display: flex;
+      margin: 10px 0;
+      justify-content: space-between;
+    }
+
+    .receipt-status{
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .green{
+        color:green;
+    }
+
+    .red{
+        color:red;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        padding: 10px;
+      }
+      .container {
+        page-break-after: always;
+      }
+      .bottom-section,
+      .signature-section {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
 </head>
 <body>
+    {% set chunk_size = 5 %}
+{% for i in range(0, receipt.invoice.items|length, chunk_size) %}
     <div class="container">
         <div class="header">
-            <div class="logo">N</div>
+            <div><img class="logo" src="https://www.hexcode.tech/images/logo.png" alt="" /></div>
             <div class="company-info">
-                <h1>NEURAL DEV CO.,LTD</h1>
-                <p>Address : 55/15 Moo5 Tambol Mueng<br>
-                Amphor Mueng Chonburi , Chonburi , 20130</p>
+                <h1 class="camel">Hexcode Technologies</h1>
+                <p>Address : Cassa City,Hua Mak, Bang Kapi, Bangkok 10240<br></p>
             </div>
         </div>
         
         <table class="invoice-details">
+            <h2>Receipt for {{receipt.invoice.customer_name}} (for invoice number: {{receipt.invoice.invoice_number}})</h2>
             <tr>
-                <td class="label">NEURAL DEV CO.,LTD</td>
+                <td class="label camel">Hexcode Technologies</td>
                 <td rowspan="3" class="label">Receipt Number : {{ receipt.receipt_number }} <br>
-                    Receipt Date : {{ receipt.receipt_date.strftime('%d/%m/%Y') }} <br>
-                    Payment Date : {{ receipt.payment_date.strftime('%d/%m/%Y') }}
+                    Payment Date : {{ receipt.payment_date.strftime('%d/%m/%Y') }}<br>
+                    Receipt Date : {{ receipt.receipt_date.strftime('%d/%m/%Y') }} 
+               
                 </td>
             </tr>
             <tr>
-                <td class="label">Customer / Buyer : {{ receipt.invoice.customer_name }}</td>
+                <td class="label camel">Customer / Buyer : {{ receipt.invoice.customer_name }}</td>
             </tr>
             <tr>
-                <td class="label">Name / Company : {{ receipt.invoice.company_name }}</td>
+                <td class="label camel">Name / Company : {{ receipt.invoice.company_name }}</td>
             </tr>
         </table>
         
@@ -232,24 +211,19 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in receipt.invoice.items %}
+                {% for item in receipt.invoice.items[i:i + chunk_size] %}
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td class="desc-col">
                         <strong>{{ item.name }}</strong><br>
                         {{ item.description or '' }}
                     </td>
-                    <td>{{ "%.2f"|format(item.unit_price) }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ "%.2f"|format(item.amount) }}</td>
+                    <td>$ {{ "%.2f"|format(item.unit_price) }}</td>
+                    <td>{{ item.quantity }} pcs</td>
+                    <td>$ {{ "%.2f"|format(item.amount) }}</td>
                 </tr>
                 {% endfor %}
                 
-                {% for i in range(4 - receipt.invoice.items|length) %}
-                {% if i >= 0 %}
-                <tr><td></td><td></td><td></td><td></td><td></td></tr>
-                {% endif %}
-                {% endfor %}
             </tbody>
         </table>
         
@@ -264,39 +238,27 @@
                 <table class="summary-table">
                     <tr>
                         <td class="label">Sub Total :</td>
-                        <td>{{ "%.2f"|format(receipt.invoice.subtotal) }}</td>
+                        <td>$ {{ "%.2f"|format(receipt.invoice.subtotal) }}</td>
                     </tr>
                     <tr>
                         <td class="label">VAT :</td>
-                        <td>{{ "%.2f"|format(receipt.invoice.vat) }}</td>
+                        <td>$ {{ "%.2f"|format(receipt.invoice.vat) }}</td>
                     </tr>
                     <tr>
                         <td class="label">Total Amount :</td>
-                        <td><strong>{{ "%.2f"|format(receipt.invoice.total_amount) }}</strong></td>
+                        <td><strong>$ {{ "%.2f"|format(receipt.invoice.total_amount) }}</strong></td>
                     </tr>
                 </table>
             </div>
         </div>
         
-        <table class="signature-section">
-            <tr>
-                <td class="payment-method">
-                    <div>
-                        <strong>Receipt Status:</strong>
-                        <p>Paid</p>
-                    </div>
-                </td>
-                <td>
-                    <strong>Payment Amount:</strong><br><br><br><br>
-                        <p>{{"%.2f"|format(receipt.payment_total)}}</p>
-                </td>
-                <td>
-                    <strong>For Neural Dev Co.,LTD</strong><br><br><br><br><br>
-                    <div class="signature-line"></div>
-                    Authorized Signature
-                </td>
-            </tr>
-        </table>
+        <p class="receipt-status">Receipt Status: 
+        {% if receipt.payment_status.value=="paid" %}  
+        <strong class="green">Already Paid</strong></p>
+        {% else %}
+        <strong class="red">Unpaid</strong></p>
+        {% endif %}
     </div>
+    {% endfor %}
 </body>
 </html>

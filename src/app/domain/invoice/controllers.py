@@ -7,7 +7,13 @@ from jinja2 import Environment, FileSystemLoader
 from advanced_alchemy.service import OffsetPagination
 from litestar import Controller, get, post, delete, patch
 from litestar.params import Dependency, Parameter
-from litestar.response import Response
+from litestar.response import Response,File
+from litestar.enums import RequestEncodingType
+from sqlalchemy import ColumnElement, or_
+
+from litestar.datastructures import UploadFile
+from litestar.params import Body
+import cloudinary.uploader
 
 from app.db import models as m
 from app.domain.accounts.guards import requires_active_user
@@ -15,6 +21,14 @@ from app.domain.invoice.services import InvoiceService
 from app.lib.deps import create_service_dependencies
 from . import urls
 from .schemas import InvoiceDTO, InvoiceCreateDTO, InvoiceUpdateDTO
+
+cloudinary.config(
+        cloud_name="dqtudbhm1",
+        api_key="281978128992832",
+        api_secret="H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8",
+        secure=True  
+    )
+CLOUDINARY_URL="cloudinary://281978128992832:H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8@dqtudbhm1"
 
 if TYPE_CHECKING:
     from advanced_alchemy.filters import FilterTypes
@@ -51,8 +65,18 @@ class InvoiceController(Controller):
     async def list_invoices(
         self,
         invoice_service: InvoiceService,
-        filters: Annotated[list[FilterTypes], Dependency(skip_validation=True)],
+        search_term:str | None,
     ) -> OffsetPagination[m.Invoice]:
+        
+        filters:list[ColumnElement[bool]]=[]
+        if search_term:
+            filters.append(
+                or_(
+                    m.Invoice.invoice_number.ilike(f"%{search_term}%"),
+                    m.Invoice.customer_name.ilike(f"%{search_term}%")
+                )
+            )
+
         results, total = await invoice_service.list_and_count(*filters)
         return invoice_service.to_schema(data=results, total=total, filters=filters)
     
@@ -69,6 +93,7 @@ class InvoiceController(Controller):
     ) -> m.Invoice:
         db_obj = await invoice_service.get(invoice_id)
         return invoice_service.to_schema(db_obj)
+    
 
     """        exclude={"id","create_at","updated_at"}
 
@@ -127,7 +152,7 @@ class InvoiceController(Controller):
         base_dir = Path(__file__).parent.parent.parent / "domain" / "web" / "templates"
         env = Environment(loader=FileSystemLoader(str(base_dir))) #search the template
         template = env.get_template("invoice_template.html") #get template
-        html_out = template.render(invoice=invoice_data) #render template
+        html_out = template.render(invoice=invoice_data, static_path="/assets") #render template
         return html_out
 
     """
@@ -135,7 +160,7 @@ class InvoiceController(Controller):
     """
     @get(path="/invoice/{invoice_id:uuid}/preview", operation_id="PreviewInvoice", return_dto=None)
     async def preview_invoice(
-        self,
+        self,            # Save URL to invoice
         invoice_service: InvoiceService,
         invoice_id: Annotated[UUID, Parameter(title="Invoice ID")],
     ) -> Response:
@@ -175,5 +200,44 @@ class InvoiceController(Controller):
         )
 
         return {"message": "Invoice email sent"}
+    
+
+    """
+    keep the invoice image in cloudinary
+    data: send Upload File, Body with RequestEncodingType.MULTI_PART
+    """
+    @post(
+    path="/invoice/{invoice_id:uuid}/signature",
+    operation_id="UploadInvoiceSignature",
+    )
+    async def upload_invoice_signature(
+        self,
+        invoice_service: InvoiceService,
+        invoice_id: Annotated[UUID, Parameter(title="Invoice ID")],
+        data: Annotated[UploadFile, Body(media_type=RequestEncodingType.MULTI_PART)],
+    ) -> dict:
+        try:
+            #upload the image with uploader.upload and store in the folder
+            result = cloudinary.uploader.upload(data.file, folder="invoice_signatures")
+
+            #update signature_url in invoice
+            await invoice_service.update(
+                item_id=invoice_id,
+                data=m.Invoice(signature_url=result.get("secure_url")),
+            )
+
+            return {
+                "message": "Signature saved",
+                "url": result.get("secure_url"),
+                "public_id": result.get("public_id"),
+            }
+        except Exception as e:
+            return {"error": str(e)}
+        
+    
+        
+
+
+
 
 

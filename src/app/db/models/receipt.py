@@ -4,12 +4,18 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import String, Date, Numeric, ForeignKey
+from sqlalchemy import String, Date, Numeric, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from advanced_alchemy.base import UUIDAuditBase
+from enum import Enum as PyEnum
 
 if TYPE_CHECKING:
     from .invoice import Invoice
+
+class PaymentEnum(PyEnum):
+
+    PAID="paid"
+    UNPAID="unpaid"
 
 class Receipt(UUIDAuditBase):
     __tablename__="receipt"
@@ -22,7 +28,7 @@ class Receipt(UUIDAuditBase):
     receipt_number:Mapped[str]=mapped_column(String,nullable=False,unique=True)
     payment_date:Mapped[date]=mapped_column(Date,nullable=False)
     receipt_date:Mapped[date]=mapped_column(Date,nullable=False)
-    payment_status:Mapped[str]=mapped_column(String,nullable=False)
+    payment_status:Mapped[PaymentEnum]=mapped_column(Enum(PaymentEnum),nullable=False)
     payment_total:Mapped[float]=mapped_column(nullable=False)
 
     invoice:Mapped[Optional[Invoice]]=relationship(

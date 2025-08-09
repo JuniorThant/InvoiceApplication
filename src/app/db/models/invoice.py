@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from .bank_info import BankInfo
     from .receipt import Receipt
 
-
 class Invoice(UUIDAuditBase):
     __tablename__ = "invoice"
     __table_args__ = {"comment": "Invoice to the customer"}
@@ -29,6 +28,7 @@ class Invoice(UUIDAuditBase):
     subtotal: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     vat: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
     total_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=True)
+    signature_url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     #use lazyload normally for one to many relationship
     items: Mapped[list[InvoiceItem]] = relationship(
