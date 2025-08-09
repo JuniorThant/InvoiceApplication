@@ -93,7 +93,7 @@ export default function ReceiptPage() {
           <div className="w-1/3"> 
           <input type="text" 
           className="w-full px-4 py-2 border rounded-md my-2"
-          placeholder="Search Requests"
+          placeholder="Search Receipts"
           value={searchTerm}
           onChange={(e)=>setSearchTerm(e.target.value)}
           />
