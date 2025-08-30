@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from uuid import UUID
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from decimal import Decimal
 
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from advanced_alchemy.service import SQLAlchemyAsyncRepositoryService
-from app.db import models as m
 from litestar.dto import DTOData
+
+from app.db import models as m
 
 __all__ = ("InvoiceService",)
 
-VAT_PERCENTAGE = Decimal("0.07") 
+VAT_PERCENTAGE = Decimal("0.07")
 
 class InvoiceService(SQLAlchemyAsyncRepositoryService[m.Invoice]):
     """Handles invoice operations with nested invoice items."""
@@ -43,9 +41,9 @@ class InvoiceService(SQLAlchemyAsyncRepositoryService[m.Invoice]):
 
             #add invoice instance
             return await self.repository.add(invoice_instance)
-    
 
-    
 
-         
-         
+
+
+
+

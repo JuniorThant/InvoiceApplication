@@ -21,3 +21,4 @@ class ReceiptService(SQLAlchemyAsyncRepositoryService[m.Receipt]):
         
      repository_type= Repository
      match_fields=["receipt_number"]
+     

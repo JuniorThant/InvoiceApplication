@@ -49,19 +49,22 @@ class ReceiptController(Controller):
     async def list_receipts(
         self,
         receipt_service:ReceiptService,
-        search_term:str | None
+        search_term:str | None,
+        filters: Annotated[list[FilterTypes | ColumnElement[bool]], Dependency(skip_validation=True)]
     )->OffsetPagination[m.Receipt]:
-        
-        filters:list[ColumnElement[bool]]=[]
-        filters.append(
-            or_(
-                (m.Receipt.receipt_number.ilike(f"%{search_term}%")),
-                (m.Receipt.invoice_number.ilike(f"%{search_term}%")),
+
+        if search_term:
+            filters.append(
+                or_(
+                    m.Receipt.receipt_number.ilike(f"%{search_term}%"),
+                    m.Receipt.invoice_number.ilike(f"%{search_term}%"),
+                    m.Receipt.invoice.has(m.Invoice.customer_name.ilike(f"%{search_term}%"))
+                )
             )
-        )
+
         results,total=await receipt_service.list_and_count(*filters)
         return receipt_service.to_schema(data=results,total=total,filters=filters)
-    
+
     """
     Post method:service name, data passing with DTOData[model]
     use create,return schema

@@ -63,7 +63,8 @@ services:
       VITE_USE_SERVER_LIFESPAN: "false" # true if ssr or separate service
       SAQ_USE_SERVER_LIFESPAN: "false"
     env_file:
-      - .env.docker.example
+      - .env.docker
+
   
   tests:
     build:

@@ -7,8 +7,10 @@ from uuid import UUID
 
 from litestar import Controller, delete, get, patch, post
 from litestar.di import Provide
-from litestar.params import Dependency, Parameter
+from litestar.params import Parameter
+from sqlalchemy import ColumnElement, or_
 
+from app.db import models as m
 from app.domain.accounts import urls
 from app.domain.accounts.deps import provide_users_service
 from app.domain.accounts.guards import requires_superuser
@@ -16,7 +18,6 @@ from app.domain.accounts.schemas import User, UserCreate, UserUpdate
 from app.lib.deps import create_filter_dependencies
 
 if TYPE_CHECKING:
-    from advanced_alchemy.filters import FilterTypes
     from advanced_alchemy.service import OffsetPagination
 
     from app.domain.accounts.services import UserService
@@ -33,8 +34,6 @@ class UserController(Controller):
         {
             "id_filter": UUID,
             "search": "name,email",
-            "pagination_type": "limit_offset",
-            "pagination_size": 20,
             "created_at": True,
             "updated_at": True,
             "sort_field": "name",
@@ -42,13 +41,21 @@ class UserController(Controller):
         },
     )
 
-    @get(operation_id="ListUsers", path=urls.ACCOUNT_LIST, cache=60)
+    @get(operation_id="ListUsers", path=urls.ACCOUNT_LIST)
     async def list_users(
         self,
         users_service: UserService,
-        filters: Annotated[list[FilterTypes], Dependency(skip_validation=True)],
+        search_term:str|None
     ) -> OffsetPagination[User]:
         """List users."""
+        filters:list[ColumnElement[bool]]=[]
+        if search_term:
+            filters.append(
+                or_(
+                    m.User.name.ilike(f"%{search_term}%"),
+                    m.User.email.ilike(f"%{search_term}%")
+                )
+            )
         results, total = await users_service.list_and_count(*filters)
         return users_service.to_schema(data=results, total=total, schema_type=User, filters=filters)
 

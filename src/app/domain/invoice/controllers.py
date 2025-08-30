@@ -1,37 +1,45 @@
 from __future__ import annotations
+
+from logging import getLogger
+from pathlib import Path
+from textwrap import wrap
 from typing import TYPE_CHECKING, Annotated
 from uuid import UUID
-from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+import cloudinary.uploader
 from advanced_alchemy.service import OffsetPagination
-from litestar import Controller, get, post, delete, patch
-from litestar.params import Dependency, Parameter
-from litestar.response import Response,File
+from jinja2 import Environment, FileSystemLoader
+from litestar import Controller, delete, get, patch, post
+from litestar.datastructures import UploadFile
 from litestar.enums import RequestEncodingType
+from litestar.params import Body, Parameter
+from litestar.response import Response
 from sqlalchemy import ColumnElement, or_
 
-from litestar.datastructures import UploadFile
-from litestar.params import Body
-import cloudinary.uploader
-
+from app.config.base import get_settings
 from app.db import models as m
-from app.domain.accounts.guards import requires_active_user
 from app.domain.invoice.services import InvoiceService
 from app.lib.deps import create_service_dependencies
+
 from . import urls
-from .schemas import InvoiceDTO, InvoiceCreateDTO, InvoiceUpdateDTO
+from .schemas import InvoiceCreateDTO, InvoiceDTO, InvoiceUpdateDTO
+
+settings = get_settings()
+logger=getLogger()
+
+CLOUD_NAME=settings.app.CLOUD_NAME
+CLOUD_API_KEY=settings.app.CLOUD_API_KEY
+CLOUD_API_SECRET=settings.app.CLOUD_API_SECRET
+CLOUDINARY_URL=settings.app.CLOUDINARY_URL
 
 cloudinary.config(
-        cloud_name="dqtudbhm1",
-        api_key="281978128992832",
-        api_secret="H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8",
-        secure=True  
-    )
-CLOUDINARY_URL="cloudinary://281978128992832:H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8@dqtudbhm1"
+    cloud_name=CLOUD_NAME,
+    api_key=CLOUD_API_KEY,
+    api_secret=CLOUD_API_SECRET,
+    secure=True
+)
 
 if TYPE_CHECKING:
-    from advanced_alchemy.filters import FilterTypes
     from litestar.dto import DTOData
 
 """To write controller methods,
@@ -67,7 +75,7 @@ class InvoiceController(Controller):
         invoice_service: InvoiceService,
         search_term:str | None,
     ) -> OffsetPagination[m.Invoice]:
-        
+
         filters:list[ColumnElement[bool]]=[]
         if search_term:
             filters.append(
@@ -79,7 +87,7 @@ class InvoiceController(Controller):
 
         results, total = await invoice_service.list_and_count(*filters)
         return invoice_service.to_schema(data=results, total=total, filters=filters)
-    
+
 
     """
     Get method: service name, id and return model
@@ -93,7 +101,6 @@ class InvoiceController(Controller):
     ) -> m.Invoice:
         db_obj = await invoice_service.get(invoice_id)
         return invoice_service.to_schema(db_obj)
-    
 
     """        exclude={"id","create_at","updated_at"}
 
@@ -103,8 +110,7 @@ class InvoiceController(Controller):
     @post(
         path=urls.INVOICE_CREATE,
         operation_id="CreateInvoice",
-        dto=InvoiceCreateDTO,
-        guards=[requires_active_user],
+        dto=InvoiceCreateDTO
     )
     async def create_invoice(
         self,
@@ -113,13 +119,11 @@ class InvoiceController(Controller):
     ) -> m.Invoice:
         db_obj = await invoice_service.create(data)
         return invoice_service.to_schema(db_obj)
-    
 
     @patch(
         path=urls.INVOICE_UPDATE,
         operation_id="UpdateInvoice",
-        dto=InvoiceUpdateDTO,
-        guards=[requires_active_user],
+        dto=InvoiceUpdateDTO
     )
     async def update_invoice(
         self,
@@ -138,8 +142,7 @@ class InvoiceController(Controller):
     @delete(
         path=urls.INVOICE_DELETE,
         operation_id="DeleteInvoice",
-        return_dto=None,
-        guards=[requires_active_user],
+        return_dto=None
     )
     async def delete_invoice(
         self,
@@ -160,7 +163,7 @@ class InvoiceController(Controller):
     """
     @get(path="/invoice/{invoice_id:uuid}/preview", operation_id="PreviewInvoice", return_dto=None)
     async def preview_invoice(
-        self,            # Save URL to invoice
+        self,
         invoice_service: InvoiceService,
         invoice_id: Annotated[UUID, Parameter(title="Invoice ID")],
     ) -> Response:
@@ -177,7 +180,7 @@ class InvoiceController(Controller):
         invoice_service: InvoiceService,
         invoice_id: Annotated[UUID, Parameter(title="Invoice ID")],
     ) -> dict:
-        from .utils import send_invoice_email  
+        from .utils import send_invoice_email
 
         invoice = await invoice_service.get(invoice_id)
 
@@ -194,13 +197,13 @@ class InvoiceController(Controller):
 
         #send email
         send_invoice_email(
-            to=invoice.customer_mail,  
+            to=invoice.customer_mail,
             subject=f"Invoice #{invoice.invoice_number} from Neural Dev Co., LTD",
             html_body=final_html,
         )
 
         return {"message": "Invoice email sent"}
-    
+
 
     """
     keep the invoice image in cloudinary
@@ -233,9 +236,9 @@ class InvoiceController(Controller):
             }
         except Exception as e:
             return {"error": str(e)}
-        
-    
-        
+
+
+
 
 
 

@@ -99,6 +99,7 @@ class AccountRegister(CamelizedBaseStruct):
     email: str
     password: str
     name: str | None = None
+    secret:str|None=None
 
 
 class UserRoleAdd(CamelizedBaseStruct):
@@ -111,3 +112,8 @@ class UserRoleRevoke(CamelizedBaseStruct):
     """User role revoke ."""
 
     user_name: str
+
+class UserChangeRole(CamelizedBaseStruct):
+    """change user role"""
+    is_superuser:bool
+

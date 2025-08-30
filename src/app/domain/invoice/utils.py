@@ -1,18 +1,21 @@
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from app.config._utils import get_env
 
-SMTP_SERVER = "sandbox.smtp.mailtrap.io"
-SMTP_PORT = 587
-MAILTRAP_USER = "254e5790826d47"
-MAILTRAP_PASS = "f74b2140e411aa"
-SENDER = "neuraldev@example.com"  
+from app.config.base import get_settings
 
+settings = get_settings()
+
+SMTP_SERVER = settings.app.SMTP_SERVER
+SMTP_PORT = settings.app.SMTP_PORT
+MAILTRAP_USER = settings.app.SMTP_USER
+MAILTRAP_PASS = settings.app.SMTP_PASS
+SENDER = settings.app.SENDER
 
 """Send invoice email function"""
-def send_invoice_email(to: str, subject: str, html_body: str):
-    
+
+def send_invoice_email(to: str, subject: str, html_body: str) -> None:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = SENDER
@@ -24,20 +27,6 @@ def send_invoice_email(to: str, subject: str, html_body: str):
             server.starttls()
             server.login(MAILTRAP_USER, MAILTRAP_PASS)
             server.sendmail(SENDER, to, msg.as_string())
-        print("Email sent successfully.")
-    except Exception as e:
-        print(f"Email send failed: {e}")
-
-
-import cloudinary
-
-import cloudinary
-
-def configure_cloudinary():
-    cloudinary.config(
-        cloud_name="Invoice",
-        api_key="281978128992832",
-        api_secret="H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8",
-        secure=True  
-    )
-
+        print("Email sent successfully")
+    except Exception:
+        raise

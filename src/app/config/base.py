@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final
+from typing import Any, Final
 
 from advanced_alchemy.utils.text import slugify
 from litestar.data_extractors import RequestExtractorField, ResponseExtractorField
@@ -18,9 +18,6 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from ._utils import get_env
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 DEFAULT_MODULE_NAME = "app"
 BASE_DIR: Final[Path] = module_to_os_path(DEFAULT_MODULE_NAME)
@@ -37,9 +34,13 @@ class DatabaseSettings:
     POOL_RECYCLE: int = field(default_factory=get_env("DATABASE_POOL_RECYCLE", 300))
     POOL_PRE_PING: bool = field(default_factory=get_env("DATABASE_PRE_POOL_PING", False))
     URL: str = field(default_factory=get_env("DATABASE_URL", "sqlite+aiosqlite:///db.sqlite3"))
-    MIGRATION_CONFIG: str = field(default_factory=get_env("DATABASE_MIGRATION_CONFIG", f"{BASE_DIR}/db/migrations/alembic.ini"))
+    MIGRATION_CONFIG: str = field(
+        default_factory=get_env("DATABASE_MIGRATION_CONFIG", f"{BASE_DIR}/db/migrations/alembic.ini")
+    )
     MIGRATION_PATH: str = field(default_factory=get_env("DATABASE_MIGRATION_PATH", f"{BASE_DIR}/db/migrations"))
-    MIGRATION_DDL_VERSION_TABLE: str = field(default_factory=get_env("DATABASE_MIGRATION_DDL_VERSION_TABLE", "ddl_version"))
+    MIGRATION_DDL_VERSION_TABLE: str = field(
+        default_factory=get_env("DATABASE_MIGRATION_DDL_VERSION_TABLE", "ddl_version")
+    )
     FIXTURE_PATH: str = field(default_factory=get_env("DATABASE_FIXTURE_PATH", f"{BASE_DIR}/db/fixtures"))
     _engine_instance: AsyncEngine | None = None
 
@@ -157,20 +158,28 @@ class LogSettings:
     LEVEL: int = field(default_factory=get_env("LOG_LEVEL", 30))
     OBFUSCATE_COOKIES: set[str] = field(default_factory=lambda: {"session", "XSRF-TOKEN"})
     OBFUSCATE_HEADERS: set[str] = field(default_factory=lambda: {"Authorization", "X-API-KEY", "X-XSRF-TOKEN"})
-    JOB_FIELDS: list[str] = field(default_factory=lambda: [
-        "function", "kwargs", "key", "scheduled", "attempts",
-        "completed", "queued", "started", "result", "error"
-    ])
-    REQUEST_FIELDS: list[RequestExtractorField] = field(default_factory=get_env(
-        "LOG_REQUEST_FIELDS",
-        ["path", "method", "query", "path_params"],
-        list[RequestExtractorField]
-    ))
-    RESPONSE_FIELDS: list[ResponseExtractorField] = field(default_factory=get_env(
-        "LOG_RESPONSE_FIELDS",
-        ["status_code"],
-        list[ResponseExtractorField]
-    ))
+    JOB_FIELDS: list[str] = field(
+        default_factory=lambda: [
+            "function",
+            "kwargs",
+            "key",
+            "scheduled",
+            "attempts",
+            "completed",
+            "queued",
+            "started",
+            "result",
+            "error",
+        ]
+    )
+    REQUEST_FIELDS: list[RequestExtractorField] = field(
+        default_factory=get_env(
+            "LOG_REQUEST_FIELDS", ["path", "method", "query", "path_params"], list[RequestExtractorField]
+        )
+    )
+    RESPONSE_FIELDS: list[ResponseExtractorField] = field(
+        default_factory=get_env("LOG_RESPONSE_FIELDS", ["status_code"], list[ResponseExtractorField])
+    )
     WORKER_EVENT: str = "Worker"
     SAQ_LEVEL: int = field(default_factory=get_env("SAQ_LOG_LEVEL", 50))
     SQLALCHEMY_LEVEL: int = field(default_factory=get_env("SQLALCHEMY_LOG_LEVEL", 30))
@@ -213,6 +222,21 @@ class AppSettings:
     JWT_ENCRYPTION_ALGORITHM: str = field(default_factory=lambda: "HS256")
     GITHUB_OAUTH2_CLIENT_ID: str = field(default_factory=get_env("GITHUB_OAUTH2_CLIENT_ID", ""))
     GITHUB_OAUTH2_CLIENT_SECRET: str = field(default_factory=get_env("GITHUB_OAUTH2_CLIENT_SECRET", ""))
+
+    SMTP_SERVER: str = field(default_factory=get_env("SMTP_SERVER", "smtp.mailtrap.io"))
+    SMTP_PORT: int = field(default_factory=get_env("SMTP_PORT", 587))
+    SMTP_USER: str = field(default_factory=get_env("MAILTRAP_USER", "254e5790826d47"))
+    SMTP_PASS: str = field(default_factory=get_env("MAILTRAP_PASS", "f74b2140e411aa"))
+    SENDER: str = field(default_factory=get_env("SENDER", "no-reply@example.com"))
+
+    CLOUD_NAME: str = field(default_factory=get_env("CLOUD_NAME", "dqtudbhm1"))
+    CLOUD_API_KEY: str = field(default_factory=get_env("CLOUD_API_KEY", "281978128992832"))
+    CLOUD_API_SECRET: str = field(default_factory=get_env("CLOUD_API_SECRET", "H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8"))
+    CLOUDINARY_URL: str = field(
+        default_factory=get_env("CLOUDINARY_URL", "cloudinary://281978128992832:H1AS_rUqO-Cmak9YHQ3Pl1zyUJ8@dqtudbhm1")
+    )
+
+    ADMIN_SECRET:str=field(default_factory=get_env("ADMIN_SECRET","c1353344"))
 
     @property
     def slug(self) -> str:

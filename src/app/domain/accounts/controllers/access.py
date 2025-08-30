@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated
+from uuid import UUID
 
 from advanced_alchemy.utils.text import slugify
-from litestar import Controller, Request, Response, get, post
+from litestar import Controller, Request, Response, get, patch, post
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
-from litestar.params import Body
+from litestar.exceptions import HTTPException
+from litestar.params import Body, Parameter
 
+from app.config.base import get_settings
 from app.domain.accounts import urls
 from app.domain.accounts.deps import provide_users_service
-from app.domain.accounts.guards import auth, requires_active_user
+from app.domain.accounts.guards import auth, requires_active_user, requires_superuser
 from app.domain.accounts.schemas import AccountLogin, AccountRegister, User
 from app.domain.accounts.services import RoleService
 from app.lib.deps import create_service_provider
@@ -22,6 +25,9 @@ if TYPE_CHECKING:
 
     from app.db import models as m
     from app.domain.accounts.services import UserService
+
+settings = get_settings()
+ADMIN_SECRET = settings.app.ADMIN_SECRET
 
 
 class AccessController(Controller):
@@ -66,13 +72,47 @@ class AccessController(Controller):
         data: AccountRegister,
     ) -> User:
         """User Signup."""
-        user_data = data.to_dict()
-        role_obj = await roles_service.get_one_or_none(slug=slugify(users_service.default_role))
-        if role_obj is not None:
-            user_data.update({"role_id": role_obj.id})
-        user = await users_service.create(user_data)
-        request.app.emit(event_id="user_created", user_id=user.id)
-        return users_service.to_schema(user, schema_type=User)
+        try:
+            user_data = data.to_dict()
+            if data.secret:
+                if data.secret == ADMIN_SECRET:
+                    user_data["is_superuser"] = True
+                else:
+                    raise HTTPException(status_code=400, detail="The admin secret is not correct")
+
+            role_obj = await roles_service.get_one_or_none(slug=slugify(users_service.default_role))
+            if role_obj is not None:
+                user_data.update({"role_id": role_obj.id})
+            user = await users_service.create(user_data)
+            request.app.emit(event_id="user_created", user_id=user.id)
+            return users_service.to_schema(user, schema_type=User)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    @patch(operation_id="ChangeRole", path=urls.CHANGE_ROLE, guards=[requires_superuser])
+    async def change_role(
+        self, user_id: Annotated[UUID, Parameter(title="User ID")], users_service: UserService, current_user: m.User
+    ) -> dict:
+        try:
+            user = await users_service.get_one_or_none(id=user_id)
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+
+            new_value = not user.is_superuser
+
+            updated_user = await users_service.update(
+                item_id=user_id,
+                data={"is_superuser": new_value}
+            )
+            return {
+                "message": "User role updated successfully",
+                "updated_user": users_service.to_schema(updated_user, schema_type=User)
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
 
     @get(operation_id="AccountProfile", path=urls.ACCOUNT_PROFILE, guards=[requires_active_user])
     async def profile(self, current_user: m.User, users_service: UserService) -> User:

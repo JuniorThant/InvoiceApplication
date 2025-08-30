@@ -27,10 +27,13 @@ from litestar.plugins.structlog import StructlogConfig
 from litestar.template import TemplateConfig
 from litestar_saq import CronJob, QueueConfig, SAQConfig
 from litestar_vite import ViteConfig
+from logging import getLogger
 
 from .base import get_settings
 
 settings = get_settings()
+
+logger=getLogger()
 
 compression = CompressionConfig(backend="gzip")
 csrf = CSRFConfig(
@@ -39,6 +42,7 @@ csrf = CSRFConfig(
     cookie_name=settings.app.CSRF_COOKIE_NAME,
 )
 cors = CORSConfig(allow_origins=cast("list[str]", settings.app.ALLOWED_CORS_ORIGINS))
+
 alchemy = SQLAlchemyAsyncConfig(
     engine_instance=settings.db.get_engine(),
     before_send_handler="autocommit",
