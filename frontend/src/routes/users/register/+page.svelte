@@ -34,8 +34,6 @@
         error=e.message
     }
   }
-
-
 </script>
 
 <SideBar/>
